@@ -3,6 +3,5 @@ services:
     app:
         build: .
         working_dir: /usr/src/app
-        command: bash -c "python app/main.py"
         volumes:
             - ${PWD}:/usr/src/app

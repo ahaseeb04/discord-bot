@@ -3,8 +3,9 @@ FROM python:latest
 WORKDIR /usr/src/app
 
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY bot/ .
 
-CMD [ "python", "./app/main.py" ]
+ENTRYPOINT python -u bot/main.py
