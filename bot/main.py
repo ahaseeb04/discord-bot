@@ -16,4 +16,4 @@ async def on_message(message):
     await verify_user(message, client)
 
 if __name__ == "__main__":
-    client.run(config.TOKEN)
+    client.run(config.token)

@@ -14,8 +14,8 @@ async def verify_user(message, client):
     if message.author == client.user:
         return
 
-    if message.channel.name == config.VERIFICATION_CHANNEL and message.content.startswith('!verify'):
-        roles = [ role.name for role in client.get_guild(int(config.SERVER_ID)).roles ]
+    if message.channel.name == config.verification_channel and message.content.startswith('!verify'):
+        roles = [ role.name for role in client.get_guild(int(config.server_id)).roles ]
         requestedRoles = message.content.split()
 
         up = { role for role in roles if role.isupper() }
