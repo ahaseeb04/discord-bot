@@ -1,7 +1,5 @@
-import sys
 import discord
 from discord.ext import commands
-from discord.utils import get
 
 import config
 from commands import verify_user
