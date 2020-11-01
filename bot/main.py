@@ -1,4 +1,6 @@
 import asyncio
+import csv
+
 import discord
 from fuzzywuzzy import fuzz
 from discord.utils import get
@@ -29,15 +31,18 @@ async def verify(context):
             print(e)
         else:
             roles = { role.name.lower() : role.name for role in client.get_guild(int(config.server_id)).roles }
-            requestedRoles = [ role.strip() for role in context.message.content.split(';') ]
+            roles = { **roles, **aliases }
+            requested_roles = [ role.strip() for role in context.message.content.split(';') ]
 
-            for requestedRole in requestedRoles:
-                requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requestedRole.lower())) > 70), default=None)
+            for requested_role in requested_roles:
+                requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requested_role.lower())) > 70), default=None)
 
-                if requested is not None:
-                    await context.message.author.add_roles(get(context.message.author.guild.roles, name=roles[requested[1]]))
+                if requested is not None and len(role := roles.get(requested[1])):
+                    await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
 
-                    print(f'{requested[1]} role assigned.')
+                    print(f'{role} role assigned.')
 
 if __name__ == "__main__":
+    aliases = dict(csv.reader(open('bot/aliases.csv', 'r')))
+
     client.run(config.token)
