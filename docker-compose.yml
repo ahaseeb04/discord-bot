@@ -1,6 +1,6 @@
-version: "3"
+version: "3.5"
 services:
-    app:
+    bot:
         build: .
         working_dir: /usr/src/app
         volumes:
