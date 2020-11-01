@@ -22,21 +22,23 @@ async def verify(context):
         return str(reaction.emoji) == '👍' and user.guild_permissions.manage_roles
 
     if context.message.channel.name == config.verification_channel:
-        roles = { role.name.lower() : role.name for role in client.get_guild(int(config.server_id)).roles }
-        requestedRoles = [ role.strip() for role in context.message.content.split(';') ]
+        try:
+            await context.message.add_reaction(emoji='👍')
+            await client.wait_for('reaction_add', check=check)
+        except asyncio.TimeoutError as e:
+            print(e)
+        else:
+            roles = { role.name.lower() : role.name for role in client.get_guild(int(config.server_id)).roles }
+            requestedRoles = [ role.strip() for role in context.message.content.split(';') ]
 
-        for requestedRole in requestedRoles:
-            requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requestedRole.lower())) > 70), default=None)
+            for requestedRole in requestedRoles:
+                requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requestedRole.lower())) > 70), default=None)
 
-            if requested is not None:
-                try:
-                    reaction, user = await client.wait_for('reaction_add', check=check)
-                except asyncio.TimeoutError as e:
-                    print(e)
-                else:
+                if requested is not None:
                     await context.message.author.add_roles(get(context.message.author.guild.roles, name=roles[requested[1]]))
-
                     print('Role assigned.')
+
+
 
 
 if __name__ == "__main__":
