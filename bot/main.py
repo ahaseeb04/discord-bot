@@ -19,7 +19,7 @@ async def verify(context):
         return
 
     def check(reaction, user):
-        return str(reaction.emoji) == '👍' and user.guild_permissions.manage_roles
+        return str(reaction.emoji) == '👍' and user.guild_permissions.manage_roles and str(user.id) != config.automod_id
 
     if context.message.channel.name == config.verification_channel:
         try:
@@ -36,7 +36,7 @@ async def verify(context):
 
                 if requested is not None:
                     await context.message.author.add_roles(get(context.message.author.guild.roles, name=roles[requested[1]]))
-                    print('Role assigned.')
+                    print(f'{requested[1]} role assigned.')
 
 
 
