@@ -35,7 +35,9 @@ async def verify(context):
             requested_roles = [ role.strip() for role in context.message.content.split(';') ]
 
             for requested_role in requested_roles:
-                requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requested_role.lower())) > 70), default=None)
+                requested = max(((ratio, role) for role in roles if (ratio := fuzz.token_sort_ratio(role, requested_role)) > 70), default=None)
+                if requested is None:
+                    requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requested_role.lower())) > 70), default=None)
 
                 if requested is not None and len(role := roles.get(requested[1])):
                     await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
@@ -43,6 +45,6 @@ async def verify(context):
                     print(f'{role} role assigned.')
 
 if __name__ == "__main__":
-    aliases = dict(csv.reader(open('bot/aliases.csv', 'r')))
+    aliases = { key :  val.strip() for key, val in csv.reader(open('bot/aliases.csv', 'r')) }
 
     client.run(config.token)
