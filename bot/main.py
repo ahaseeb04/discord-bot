@@ -20,13 +20,18 @@ async def verify(context):
     if context.message.author == client.user:
         return
 
-    def check(reaction, user):
-        return str(reaction.emoji) == '👍' and user.guild_permissions.manage_roles and str(user.id) != config.bot_id
+    def react_check(message):
+        def check(reaction, user):
+            return reaction.message.id == message.id \
+                and reaction.emoji == '👍' \
+                and user.guild_permissions.manage_roles \
+                and str(user.id) != config.bot_id
+        return check
 
     if context.message.channel.name == config.verification_channel:
         try:
             await context.message.add_reaction(emoji='👍')
-            await client.wait_for('reaction_add', check=check)
+            await client.wait_for('reaction_add', check=react_check(context.message))
         except asyncio.TimeoutError as e:
             print(e)
         else:
