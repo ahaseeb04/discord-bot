@@ -19,9 +19,12 @@ async def verify(context):
 
     if context.message.channel.name == config.verification_channel:
         roles = { role.name.lower() : role.name for role in client.get_guild(int(config.server_id)).roles }
-        requestedRoles = context.message.content.split()
+        requestedRoles = context.message.content.split(';')
 
         for requestedRole in requestedRoles:
+            if requestedRole[-1:].isspace():
+                requestedRole = requestedRole[:-1]
+
             requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requestedRole.lower())) > 70), default=None)
 
             if requested is not None:
