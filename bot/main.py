@@ -47,21 +47,7 @@ async def verify(context):
         except asyncio.TimeoutError as e:
             pass
         else:
-<<<<<<< HEAD
-            roles = { role.name.lower() : role.name for role in client.get_guild(int(config.server_id)).roles }
-            roles = { **roles, **aliases }
-
-            requested_roles = [ role.strip() for role in context.message.content.split(';') ]
-
-            for requested_role in requested_roles:
-                requested = max(((ratio, role) for role in roles if (ratio := fuzz.token_sort_ratio(role, requested_role)) > 70), default=None)
-
-                if requested is None:
-                    requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requested_role.lower())) > 70), default=None)
-
-=======
             for requested in requested_roles:
->>>>>>> 27de7435e23181c184791aac453c161019b6d406
                 if requested is not None and len(role := roles.get(requested[1])):
                     await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
 
