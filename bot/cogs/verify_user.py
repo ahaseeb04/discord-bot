@@ -43,7 +43,7 @@ class VerifyUser(commands.Cog):
                 requested_roles = list(get_requested_roles())
 
                 await context.message.add_reaction(emoji='👍')
-                await self.client.wait_for('reaction_add', check=check_reaction(context.message))
+                await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
             except asyncio.TimeoutError as e:
                 pass
             else:
