@@ -23,7 +23,7 @@ class VerifyUser(commands.Cog):
             return check
 
         def get_requested_roles():
-            requested_roles = [ role.strip() for role in context.message.content.split(';') ]
+            requested_roles = [ role.strip() for role in context.message.content.split(self.client.command_prefix) ]
 
             for requested_role in requested_roles:
                 requested = max(((ratio, role) for role in roles if (ratio := fuzz.token_sort_ratio(role, requested_role)) > 70), default=None)
