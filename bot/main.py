@@ -50,11 +50,6 @@ async def verify(context):
             print(e)
         else:
             for requested in requested_roles:
-                print(requested)
-                # requested = max(((ratio, role) for role in roles if (ratio := fuzz.token_sort_ratio(role, requested_role)) > 70), default=None)
-                # if requested is None:
-                #     requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requested_role.lower())) > 70), default=None)
-
                 if requested is not None and len(role := roles.get(requested[1])):
                     await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
 
