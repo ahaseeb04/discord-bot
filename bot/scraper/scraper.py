@@ -65,7 +65,12 @@ def scrape_course(course):
 
     URL = find_course_URL(course)
     if URL is None:
-        return {'error': 'page_not_found'}
+        return {
+            'error': 
+            'The requested course was not found. Courses should be of the form: \n \
+            [faculty] dept number [session year] \n \
+            i.e. EECS 3311 or LE EECS 3311 or EECS 3311 FW 2020 or LE EECS 3311 FW 2020'
+        }
     page = requests.get(URL)
     soup = bs4.BeautifulSoup(page.content, 'html.parser')
 
