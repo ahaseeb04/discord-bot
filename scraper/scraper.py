@@ -1,19 +1,36 @@
+import csv
 from itertools import islice
 
-import requests
 import bs4
-  
+import requests
+
+
 def find_course_URL(course):
-    URL = f"https://w2prod.sis.yorku.ca/Apps/WebObjects/cdm.woa/wa/crsq1?faculty={course[0]}&subject={course[1]}&academicyear=2020&studysession=FW"
+    def build_link(faculty, department, number, session, year):
+        faculty = faculty or dict(csv.reader(open('scraper/faculties.csv', 'r'))).get(department)
+        yield f'faculty={faculty}'
+        yield f'subject={department}'
+        if session is not None and year is not None:
+            yield f'academicyear={year}'
+            yield f'studysession={session}'
+
+    prefix = "https://w2prod.sis.yorku.ca/Apps/WebObjects/cdm.woa/wa/crsq1?"
+    suffix = '&'.join(build_link(**course))
+    URL = ''.join([prefix, suffix])
+
     page = requests.get(URL)
 
     soup = bs4.BeautifulSoup(page.content, 'html.parser')
-    rows = soup.find_all('table')[6].find_all('tr', recursive=False)
+    try:
+        rows = soup.find_all('table')[6].find_all('tr', recursive=False)
+    except:
+        return None
 
     for row in rows[1:]:
         code, link = row.find_all('td', recursive=False)[::2]
-        if code.text.split()[1] == course[2]:
+        if code.text.split()[1] == course['number']:
             return ''.join(("https://w2prod.sis.yorku.ca/", link.find('a')['href']))
+    return None
 
 def scrape_course(course):
     def scrape_heading(soup):
@@ -47,6 +64,9 @@ def scrape_course(course):
         
 
     URL = find_course_URL(course)
+    if URL is None:
+        print("page not found")
+        return
     page = requests.get(URL)
     soup = bs4.BeautifulSoup(page.content, 'html.parser')
 
@@ -59,8 +79,12 @@ def scrape_course(course):
     return crs
     
 if __name__ == "__main__":
-    course = ["LE", "EECS", "3101"]
-    # course = ["SC", "PHYS", "1421"]
-    # course = ["AP", "ECON", "1000"]
+    import re
 
-    print(scrape_course(course))
+    # course = "LE EECS 3101 FW 2020"
+    # course = "LE EECS 3101"
+    course = "EECS 3101"
+    # course = "EN 3101 FW 2020"
+    m = re.match("(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s(?P<number>[0-9]{4}))+(?:\s(?P<session>[a-z]{2})\s(?P<year>[0-9]{4}))?", course.lower())
+
+    print(scrape_course(m.groupdict()))
