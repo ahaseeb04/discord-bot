@@ -7,7 +7,7 @@ import requests
 
 def find_course_URL(course):
     def build_link(faculty, department, number, session, year):
-        faculty = faculty or dict(csv.reader(open('scraper/faculties.csv', 'r'))).get(department)
+        faculty = faculty or dict(csv.reader(open('bot/scraper/faculties.csv', 'r'))).get(department)
         yield f'faculty={faculty}'
         yield f'subject={department}'
         if session is not None and year is not None:
@@ -65,8 +65,7 @@ def scrape_course(course):
 
     URL = find_course_URL(course)
     if URL is None:
-        print("page not found")
-        return
+        return {'error': 'page_not_found'}
     page = requests.get(URL)
     soup = bs4.BeautifulSoup(page.content, 'html.parser')
 
