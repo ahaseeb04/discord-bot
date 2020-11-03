@@ -32,7 +32,7 @@ def scrape_course(course):
         for row in islice(rows, 1, None):
             columns = row.find_all('td', recursive=False)
             if columns[2].text == 'Cancelled':
-                sect['cancelled'] = 'Cancelled'
+                sect[info] = 'Cancelled'
             else:
                 lect_type = columns[0].text
                 sect[info][lect_type] = {}
