@@ -10,40 +10,29 @@ import config
 
 
 class EmbedBuilder():
-    def __init__(self, title=None, description=None, color=None, url=None, thumbnail=None, inline=False):
-        self.counter = 1
-        self.color = color
-        self.title = title
-        self.url = url
-        self.thumbnail = thumbnail
-        self.embeds = []
-        embed = discord.Embed(title=title, description=description, color=color, url=url, inline=inline)
-        if self.thumbnail is not None:
-            embed.set_thumbnail(url=self.thumbnail)
-        self.embeds.append(embed)
+    def __init__(self, **kwargs):
+        self.properties = {
+            'color' : kwargs.get('color', ''),
+            'title' : kwargs.get('title', ''),
+            'url' : kwargs.get('url', ''),
+            'thumbnail' : kwargs.get('thumbnail', discord.Embed.Empty)
+        }
+        self.thumbnail = kwargs.pop('thumbnail', discord.Embed.Empty)
+        self.embeds = [discord.Embed(**kwargs).set_thumbnail(url=self.properties['thumbnail'])]
 
-    def add_field(self, name, value, inline=False):
-        if self.counter % 25 == 0:
-            embed = discord.Embed(title=self.title, url=self.url, color=self.color)
-            embed.add_field(name=name, value=value, inline=inline)
-            if self.thumbnail is not None:
-                embed.set_thumbnail(url=self.thumbnail)
+    def add_field(self, **kwargs):
+        embed = self.embeds[-1]
+        if len(embed.fields) == 25:
+            embed = discord.Embed(**self.properties).set_thumbnail(url=self.properties['thumbnail'])
             self.embeds.append(embed)
-            self.counter += 1
-        else:
-            self.embeds[-1].add_field(name=name, value=value, inline=inline)
-            self.counter += 1
+        embed.add_field(**kwargs)
 
     def __iter__(self):
         return iter(self.embeds)
 
-
-
-
 class YorkuScraper(commands.Cog):
     def __init__(self, client):
         self.client = client
-
 
     @commands.command()
     async def course(self, context):
@@ -58,7 +47,6 @@ class YorkuScraper(commands.Cog):
                      url=info['url'],
                      thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
                 )
-                # embed = discord.Embed(title=info['heading'], description=info['description'], color=0x0000ff, inline=False, url=info['url'])
                 header = '\u200b'
                 for section in info['sections']:
                     for sect in section:
@@ -112,7 +100,6 @@ class YorkuScraper(commands.Cog):
         embeds = format_output(scraper.scrape_course(info.groupdict()))
         for embed in embeds:
             await context.channel.send(embed=embed)
-
 
 def setup(client):
     client.add_cog(YorkuScraper(client))
