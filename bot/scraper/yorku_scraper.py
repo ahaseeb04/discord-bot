@@ -59,14 +59,15 @@ def scrape_course(course):
                 sect[info][lect_type]['lectures'] = []
                 for row in columns[1].find_all('tr'):
                     lec = { l : r.text for l, r in zip(labels, row) }
+                    if columns[4].find(string= lambda t: "backup" in t.lower()) is not None:
+                        lec['Backup'] = 'backup'
                     sect[info][lect_type]['lectures'].append(lec)
         return sect
         
 
     URL = find_course_URL(course)
     if URL is None:
-        return {
-            
+        return {    
             'error': 
             "The requested course was not found. \n\
             \nCourses should be of the form: \
@@ -94,8 +95,9 @@ if __name__ == "__main__":
 
     # course = "LE EECS 3101 FW 2020"
     # course = "LE EECS 3101"
-    course = "EECS 3101"
+    course = "math 1013"
     # course = "EN 3101 FW 2020"
     m = re.match("(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s(?P<course>[0-9]{4}))+(?:\s(?P<session>[a-z]{2})\s(?P<year>[0-9]{4}))?", course.lower())
 
+    # scrape_course(m.groupdict())
     print(scrape_course(m.groupdict()))

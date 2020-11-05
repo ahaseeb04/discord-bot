@@ -52,9 +52,14 @@ class YorkuScraper(commands.Cog):
                 def format_location(location):
                     return f'@{location}' if location != '\xa0 ' else ''
 
+                def format_backup(backup):
+                    return f'- {backup}' if backup is not None else ''
+
+                print(lecture)
                 yield format_day(lecture['Day'])
                 yield format_times(lecture['Start Time'], lecture['Duration'])
                 yield format_location(lecture['Location'])
+                yield format_backup(lecture.get('Backup'))
 
             for lect in section:
                 embed.add_field(

@@ -16,8 +16,8 @@ async def on_ready():
     print('Ready.')
 
 if __name__ == "__main__":
-    for cog in inspect.getmembers(cogs, inspect.isclass):
-        if issubclass(type(cog[1]), type(commands.Cog)):
-            client.load_extension(cog[1].__module__)
+    for name, cog in inspect.getmembers(cogs, inspect.isclass):
+        if isinstance(cog, type(commands.Cog)):
+            client.load_extension(cog.__module__)
 
     client.run(config.token)
