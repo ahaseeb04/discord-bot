@@ -2,3 +2,5 @@ discord.py
 python-dotenv
 fuzzywuzzy
 python-Levenshtein
+requests
+beautifulsoup4
