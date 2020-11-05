@@ -5,7 +5,7 @@ import bs4
 import requests
 
 
-def find_course_URL(course):
+def find_course_URLS(course):
     def build_link(faculty, department, course, session, year):
         faculty = faculty or dict(csv.reader(open('bot/scraper/faculties.csv', 'r'))).get(department)
         yield f'faculty={faculty}'
@@ -29,8 +29,7 @@ def find_course_URL(course):
     for row in rows[1:]:
         code, link = row.find_all('td', recursive=False)[::2]
         if code.text.split()[1] == course['course']:
-            return ''.join(("https://w2prod.sis.yorku.ca/", link.find('a')['href']))
-    return None
+            yield ''.join(("https://w2prod.sis.yorku.ca/", link.find('a')['href']))
 
 def scrape_course(course):
     def scrape_heading(soup):
@@ -65,8 +64,8 @@ def scrape_course(course):
         return sect
         
 
-    URL = find_course_URL(course)
-    if URL is None:
+    URLS = list(find_course_URLS(course))
+    if not URLS:
         return {    
             'error': 
             "The requested course was not found. \n\
@@ -78,26 +77,18 @@ def scrape_course(course):
             \n\u2003\u2022 EECS 3311 FW 2020 \
             \n\u2003\u2022 LE EECS 3311 FW 2020"
         }
-    page = requests.get(URL)
-    soup = bs4.BeautifulSoup(page.content, 'html.parser')
 
-    crs = {}
-    crs['heading'] = scrape_heading(soup)
-    crs['description'] = scrape_description(soup)
-    sections = filter(lambda s: isinstance(s, bs4.element.Tag), soup.find_all('table')[6])
-    crs['sections'] = list(map(scrape_section, sections))
-    crs['url'] = URL
+    candidate = (-1, None) 
+    for URL in URLS:
+        page = requests.get(URL)
+        soup = bs4.BeautifulSoup(page.content, 'html.parser')
 
-    return crs
-    
-if __name__ == "__main__":
-    import re
+        crs = {}
+        crs['heading'] = scrape_heading(soup)
+        crs['description'] = scrape_description(soup)
+        sections = filter(lambda s: isinstance(s, bs4.element.Tag), soup.find_all('table')[6])
+        crs['sections'] = list(map(scrape_section, sections))
+        crs['url'] = URL
+        candidate = max((len([x for v in crs['sections'] for x in v.values() if x != 'Cancelled']), crs), candidate)
 
-    # course = "LE EECS 3101 FW 2020"
-    # course = "LE EECS 3101"
-    course = "math 1013"
-    # course = "EN 3101 FW 2020"
-    m = re.match("(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s(?P<course>[0-9]{4}))+(?:\s(?P<session>[a-z]{2})\s(?P<year>[0-9]{4}))?", course.lower())
-
-    # scrape_course(m.groupdict())
-    print(scrape_course(m.groupdict()))
+    return candidate[1]
