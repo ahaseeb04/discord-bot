@@ -6,7 +6,7 @@ import requests
 
 
 def find_course_URL(course):
-    def build_link(faculty, department, number, session, year):
+    def build_link(faculty, department, course, session, year):
         faculty = faculty or dict(csv.reader(open('bot/scraper/faculties.csv', 'r'))).get(department)
         yield f'faculty={faculty}'
         yield f'subject={department}'
@@ -28,7 +28,7 @@ def find_course_URL(course):
 
     for row in rows[1:]:
         code, link = row.find_all('td', recursive=False)[::2]
-        if code.text.split()[1] == course['number']:
+        if code.text.split()[1] == course['course']:
             return ''.join(("https://w2prod.sis.yorku.ca/", link.find('a')['href']))
     return None
 
@@ -68,12 +68,14 @@ def scrape_course(course):
         return {
             
             'error': 
-            """
-                The requested course was not found. Courses should be of the form: \n 
-                [faculty] dept number [session year] \n 
-                If the one you tried didn't work, try another \n 
-                Examples: EECS 3311, LE EECS 3311, EECS 3311 FW 2020, LE EECS 3311 FW 2020
-            """
+            "The requested course was not found. \n\
+            \nCourses should be of the form: \
+            \n\u2003\u2002[faculty] dept course [session year] \n\
+            \nExamples: \
+            \n\u2003\u2022 EECS 3311 \
+            \n\u2003\u2022 LE EECS 3311 \
+            \n\u2003\u2022 EECS 3311 FW 2020 \
+            \n\u2003\u2022 LE EECS 3311 FW 2020"
         }
     page = requests.get(URL)
     soup = bs4.BeautifulSoup(page.content, 'html.parser')
@@ -83,6 +85,7 @@ def scrape_course(course):
     crs['description'] = scrape_description(soup)
     sections = filter(lambda s: isinstance(s, bs4.element.Tag), soup.find_all('table')[6])
     crs['sections'] = list(map(scrape_section, sections))
+    crs['url'] = URL
 
     return crs
     
@@ -93,6 +96,6 @@ if __name__ == "__main__":
     # course = "LE EECS 3101"
     course = "EECS 3101"
     # course = "EN 3101 FW 2020"
-    m = re.match("(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s(?P<number>[0-9]{4}))+(?:\s(?P<session>[a-z]{2})\s(?P<year>[0-9]{4}))?", course.lower())
+    m = re.match("(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s(?P<course>[0-9]{4}))+(?:\s(?P<session>[a-z]{2})\s(?P<year>[0-9]{4}))?", course.lower())
 
     print(scrape_course(m.groupdict()))

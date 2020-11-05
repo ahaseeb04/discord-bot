@@ -1,5 +1,6 @@
 import os
 import inspect
+import csv
 
 import discord
 from discord.ext import commands
@@ -16,6 +17,7 @@ async def on_ready():
 
 if __name__ == "__main__":
     for cog in inspect.getmembers(cogs, inspect.isclass):
-        client.load_extension(f'cogs.{cog[1].__module__}')
+        if issubclass(type(cog[1]), type(commands.Cog)):
+            client.load_extension(cog[1].__module__)
 
     client.run(config.token)
