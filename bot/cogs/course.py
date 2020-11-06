@@ -30,15 +30,24 @@ class EmbedBuilder():
     def __iter__(self):
         return iter(self.embeds)
 
-class YorkuScraper(commands.Cog):
+class GetCourse(commands.Cog):
     def __init__(self, client):
         self.client = client
 
     @commands.command()
     async def course(self, context):
         def format_output(info):
-            if info.get('error') is not None:
-                return EmbedBuilder(title="Error", description=info['error'], color=0xff0000, inline=False)
+            error = "The requested course was not found. \n\
+                \nCourses should be of the form: \
+                \n\u2003\u2002[faculty] dept course [session year] \n\
+                \nExamples: \
+                \n\u2003\u2022 EECS 3311 \
+                \n\u2003\u2022 LE EECS 3311 \
+                \n\u2003\u2022 EECS 3311 FW 2020 \
+                \n\u2003\u2022 LE EECS 3311 FW 2020"  
+
+            if info.get('error', None) is not None:
+                return EmbedBuilder(title="Error", description=error, color=0xff0000, inline=False)
             else:
                 embeds = EmbedBuilder(
                     title=info['heading'], 
@@ -102,4 +111,4 @@ class YorkuScraper(commands.Cog):
             await context.channel.send(embed=embed)
 
 def setup(client):
-    client.add_cog(YorkuScraper(client))
+    client.add_cog(GetCourse(client))
