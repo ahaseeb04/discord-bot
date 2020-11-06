@@ -42,4 +42,5 @@ class CourseList(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(CourseList(client))
+    # client.add_cog(CourseList(client))
+    pass

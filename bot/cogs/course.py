@@ -59,9 +59,7 @@ class GetCourse(commands.Cog):
                 header = '\u200b'
                 for section in info['sections']:
                     for sect in section:
-                        if section[sect] == "Cancelled":
-                            embeds.add_field(name=header, value=f'___***{sect}***___\n{section[sect]}', inline=False)
-                        else:
+                        if sum([len(x) for l in section[sect] for x in section[sect][l]['lectures']]) > 0:
                             embeds.add_field(name=header, value=f'___***{sect}***___', inline=False)
                             embeds = build_embed(embeds, section[sect])
                 return embeds
@@ -97,18 +95,21 @@ class GetCourse(commands.Cog):
                 yield format_backup(lecture.get('Backup'))
 
             for lect in section:
-                embeds.add_field(
-                    name=f"{lect}: {section[lect].get('instructors', 'Not Available')}",
-                    value='\n'.join(build_lectures(section[lect]['lectures'])),
-                    inline=False
-                )
+                if len(section[lect]['lectures']) > 0:
+                    embeds.add_field(
+                        name=f"{lect}: {section[lect].get('instructors', 'Not Available')}",
+                        value='\n'.join(build_lectures(section[lect]['lectures'])),
+                        inline=False
+                    )
             return embeds
 
         course = ' '.join(context.message.content.split()[1:])
         info = re.match("(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s?(?P<course>[0-9]{4}))+(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?", course.lower())
-        embeds = format_output(scraper.scrape_course(info.groupdict()))
-        for embed in embeds:
-            await context.channel.send(embed=embed)
+        listings = scraper.scrape_course(info.groupdict())
+        print(listings)
+        for listing in listings:
+            for embed in format_output(listing):
+                await context.channel.send(embed=embed)
 
 def setup(client):
     client.add_cog(GetCourse(client))

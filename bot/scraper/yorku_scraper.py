@@ -6,7 +6,7 @@ import requests
 
 
 def scrape_course_list(course):
-    def build_link(department, faculty=None, session=None, year=None):
+    def build_link(department, course=None, faculty=None, session=None, year=None):
         faculty = faculty or dict(csv.reader(open('bot/scraper/faculties.csv', 'r'))).get(department)
         yield f'faculty={faculty}'
         yield f'subject={department}'
@@ -46,9 +46,7 @@ def scrape_course(course):
         sect[info] = {}
         for row in islice(rows, 1, None):
             columns = row.find_all('td', recursive=False)
-            if columns[2].text == 'Cancelled':
-                sect[info] = 'Cancelled'
-            else:
+            if columns[2].text != 'Cancelled':
                 lect_type = columns[0].text
                 sect[info][lect_type] = {}
                 instructor = ', '.join(c.text for c in row.find_all('a'))
@@ -65,7 +63,6 @@ def scrape_course(course):
 
     URLS = list(scrape_course_list(course))
 
-    candidate = (-1, {'error' : 'error'}) 
     for URL in URLS:
         if URL[0].split()[1] == course['course']:
             page = requests.get(URL[2])
@@ -77,6 +74,4 @@ def scrape_course(course):
             sections = filter(lambda s: isinstance(s, bs4.element.Tag), soup.find_all('table')[6])
             crs['sections'] = list(map(scrape_section, sections))
             crs['url'] = URL[2]
-            candidate = max((len([x for v in crs['sections'] for x in v.values() if x != 'Cancelled']), crs), candidate)
-
-    return candidate[1]
+            yield crs
