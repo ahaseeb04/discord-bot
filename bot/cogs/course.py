@@ -30,29 +30,36 @@ class EmbedBuilder():
     def __iter__(self):
         return iter(self.embeds)
 
-class YorkuScraper(commands.Cog):
+class GetCourse(commands.Cog):
     def __init__(self, client):
         self.client = client
 
     @commands.command()
     async def course(self, context):
         def format_output(info):
-            if info.get('error') is not None:
-                return EmbedBuilder(title="Error", description=info['error'], color=0xff0000, inline=False)
+            error = "The requested course was not found. \n\
+                \nCourses should be of the form: \
+                \n\u2003\u2002[faculty] dept course [session year] \n\
+                \nExamples: \
+                \n\u2003\u2022 EECS 3311 \
+                \n\u2003\u2022 LE EECS 3311 \
+                \n\u2003\u2022 EECS 3311 FW 2020 \
+                \n\u2003\u2022 LE EECS 3311 FW 2020"  
+
+            if info.get('error', None) is not None:
+                return EmbedBuilder(title="Error", description=error, color=0xff0000, inline=False)
             else:
                 embeds = EmbedBuilder(
                     title=info['heading'], 
                     description=info['description'],
-                     color=0x0000ff, 
-                     url=info['url'],
-                     thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
+                    color=0x0000ff, 
+                    url=info['url'],
+                    thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
                 )
                 header = '\u200b'
                 for section in info['sections']:
                     for sect in section:
-                        if section[sect] == "Cancelled":
-                            embeds.add_field(name=header, value=f'___***{sect}***___\n{section[sect]}', inline=False)
-                        else:
+                        if sum([len(x) for l in section[sect] for x in section[sect][l]['lectures']]) > 0:
                             embeds.add_field(name=header, value=f'___***{sect}***___', inline=False)
                             embeds = build_embed(embeds, section[sect])
                 return embeds
@@ -88,18 +95,21 @@ class YorkuScraper(commands.Cog):
                 yield format_backup(lecture.get('Backup'))
 
             for lect in section:
-                embeds.add_field(
-                    name=f"{lect}: {section[lect].get('instructors', 'Not Available')}",
-                    value='\n'.join(build_lectures(section[lect]['lectures'])),
-                    inline=False
-                )
+                if len(section[lect]['lectures']) > 0:
+                    embeds.add_field(
+                        name=f"{lect}: {section[lect].get('instructors', 'Not Available')}",
+                        value='\n'.join(build_lectures(section[lect]['lectures'])),
+                        inline=False
+                    )
             return embeds
 
         course = ' '.join(context.message.content.split()[1:])
         info = re.match("(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s?(?P<course>[0-9]{4}))+(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?", course.lower())
-        embeds = format_output(scraper.scrape_course(info.groupdict()))
-        for embed in embeds:
-            await context.channel.send(embed=embed)
+        listings = scraper.scrape_course(info.groupdict())
+        print(listings)
+        for listing in listings:
+            for embed in format_output(listing):
+                await context.channel.send(embed=embed)
 
 def setup(client):
-    client.add_cog(YorkuScraper(client))
+    client.add_cog(GetCourse(client))
