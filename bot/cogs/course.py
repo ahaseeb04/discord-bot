@@ -52,9 +52,9 @@ class GetCourse(commands.Cog):
                 embeds = EmbedBuilder(
                     title=info['heading'], 
                     description=info['description'],
-                     color=0x0000ff, 
-                     url=info['url'],
-                     thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
+                    color=0x0000ff, 
+                    url=info['url'],
+                    thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
                 )
                 header = '\u200b'
                 for section in info['sections']:
