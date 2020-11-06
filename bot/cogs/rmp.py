@@ -10,18 +10,22 @@ class Rmp(commands.Cog):
     @commands.command()
     async def rmp(self, context):
         professor_name = context.message.content.lower().split()[1:]
-        data = scraper.scrape_rmp(professor_name)
 
-        embed = discord.Embed(title=data['name'], url=data['hyperlink'], color=0x0000ff)
+        try:
+            data = scraper.scrape_rmp(professor_name)
 
-        embed.set_thumbnail(url='https://i.imgur.com/0eDVqDp.png')
+            embed = discord.Embed(title=data['name'], url=data['hyperlink'], color=0x0000ff)
 
-        embed.add_field(name='Top review', value=data['review'], inline=False)
-        embed.add_field(name='Rating', value=data['rating'] + '/5', inline=False)
-        embed.add_field(name='Difficulty', value=data['difficulty'], inline=False)
-        embed.add_field(name='Would take again', value=data['take_again'], inline=False)
+            embed.set_thumbnail(url='https://i.imgur.com/0eDVqDp.png')
 
-        await context.message.channel.send(embed=embed)
+            embed.add_field(name='Top review', value=data['review'], inline=False)
+            embed.add_field(name='Rating', value=data['rating'] + '/5', inline=False)
+            embed.add_field(name='Difficulty', value=data['difficulty'], inline=False)
+            embed.add_field(name='Would take again', value=data['take_again'], inline=False)
+
+            await context.message.channel.send(embed=embed)
+        except Exception:
+            await context.message.channel.send('**Error**: Sorry, could not find professor!')
 
 def setup(client):
     client.add_cog(Rmp(client))
