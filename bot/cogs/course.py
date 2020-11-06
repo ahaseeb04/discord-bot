@@ -103,13 +103,25 @@ class GetCourse(commands.Cog):
                     )
             return embeds
 
+        error = "The requested course was not found. \n\
+            \nCourses should be of the form: \
+            \n\u2003\u2002[faculty] dept course [session year] \n\
+            \nExamples: \
+            \n\u2003\u2022 EECS 3311 \
+            \n\u2003\u2022 LE EECS 3311 \
+            \n\u2003\u2022 EECS 3311 FW 2020 \
+            \n\u2003\u2022 LE EECS 3311 FW 2020"  
+
         course = ' '.join(context.message.content.split()[1:])
         info = re.match("(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s?(?P<course>[0-9]{4}))+(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?", course.lower())
-        listings = scraper.scrape_course(info.groupdict())
-        print(listings)
-        for listing in listings:
-            for embed in format_output(listing):
-                await context.channel.send(embed=embed)
+        listings = list(scraper.scrape_course(info.groupdict()))
+        if not len(listings):
+            embed = discord.Embed(title="Error", description=error, color=0xff0000, inline=False)
+            await context.channel.send(embed=embed)
+        else:
+            for listing in listings:
+                for embed in format_output(listing):
+                    await context.channel.send(embed=embed)
 
 def setup(client):
     client.add_cog(GetCourse(client))
