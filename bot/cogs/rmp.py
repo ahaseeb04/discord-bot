@@ -14,7 +14,7 @@ class Rmp(commands.Cog):
         try:
             data = scraper.scrape_rmp(professor_name)
 
-            embed = discord.Embed(title=data['name'], url=data['hyperlink'], color=0x00ff00)
+            embed = discord.Embed(title=data['name'], url=data['hyperlink'], color=0x14532d)
 
             embed.set_thumbnail(url='https://i.imgur.com/0eDVqDp.png')
 
