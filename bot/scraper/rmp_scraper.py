@@ -9,7 +9,8 @@ def get_professor_id(professor_name):
     results = soup.find_all('li', class_='listing')
 
     for result in results:
-        if 'york university' in result.find('span', class_='sub').text.lower():
+        institution = result.find('span', class_='sub').text.lower()
+        if 'york university' in institution and 'new' not in institution:
             professor_id = result.find('a')['href']
 
     return professor_id
@@ -25,7 +26,7 @@ def scrape_rmp(professor_name):
     metrics = soup.find_all(attrs={ 'class': lambda e: search(e, 'FeedbackItem__FeedbackNumber') })
 
     professor = {}
-    professor['hyperlink'] = url
+    professor['url'] = url
     professor['name'] = ' '.join(s.capitalize() for s in professor_name)
     professor['rating'] = soup.find(attrs={ 'class': lambda e: search(e, 'RatingValue__Numerator') }).text
     professor['take_again'] = metrics[0].text
