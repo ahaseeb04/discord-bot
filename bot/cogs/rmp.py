@@ -18,7 +18,7 @@ class Rmp(commands.Cog):
             embed.set_thumbnail(url='https://i.imgur.com/0eDVqDp.png')
 
             embed.add_field(name='Top review', value=data['review'], inline=False)
-            embed.add_field(name='Rating', value=f'{data['rating']}/5', inline=False)
+            embed.add_field(name='Rating', value=data['rating'] + '/5', inline=False)
             embed.add_field(name='Difficulty', value=data['difficulty'], inline=False)
             embed.add_field(name='Would take again', value=data['take_again'], inline=False)
 
