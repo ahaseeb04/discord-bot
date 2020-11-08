@@ -6,6 +6,7 @@ from discord.utils import get
 from discord.ext import commands
 
 from bot import config
+from bot.exceptions import IllegalFormatException
 
 class VerifyUser(commands.Cog):
     def __init__(self, client):
@@ -51,7 +52,8 @@ class VerifyUser(commands.Cog):
                     await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
                 except IllegalFormatException:
                     channel = self.client.get_channel(int(config.verification_rules_channel))
-                    await context.message.channel.send(f'{context.message.author.mention} Sorry, please read {channel.mention} and try again.')
+                    await context.message.channel.send(f'{context.message.author.mention} Sorry, please read {channel.mention} and try again!')
+
                     return
             except asyncio.TimeoutError as e:
                 pass
@@ -62,8 +64,8 @@ class VerifyUser(commands.Cog):
 
                         print(f'{role} role assigned.')
 
-class IllegalFormatException(Exception):
-    pass
+# class IllegalFormatException(Exception):
+#     pass
 
 def setup(client):
     client.add_cog(VerifyUser(client))

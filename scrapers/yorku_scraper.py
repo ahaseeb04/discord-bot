@@ -4,7 +4,6 @@ from itertools import islice
 import bs4
 import requests
 
-
 def scrape_course_list(course):
     def _build_link(department, course=None, faculty=None, session=None, year=None):
         faculty = faculty or dict(csv.reader(open('scrapers/support/faculties.csv', 'r'))).get(department)

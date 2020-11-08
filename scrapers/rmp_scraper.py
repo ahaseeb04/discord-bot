@@ -11,9 +11,7 @@ def get_professor_id(professor_name):
     for result in results:
         institution = result.find('span', class_='sub').text.lower()
         if 'york university' in institution and 'new' not in institution:
-            professor_id = result.find('a')['href']
-
-    return professor_id
+            return result.find('a')['href']
 
 def scrape_rmp(professor_name):
     search = lambda e, s: e.startswith(s) if e else False

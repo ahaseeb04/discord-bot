@@ -7,8 +7,9 @@ import discord
 from discord.ext import commands
 
 from scrapers import scrape_course
+from bot import config 
 from bot.embed_builder import EmbedBuilder
-from bot import config
+from bot.exceptions import IllegalFormatException
 
 class Course(commands.Cog):
     def __init__(self, client):
@@ -46,7 +47,7 @@ class Course(commands.Cog):
 
             def _format_lecture(lecture):
                 def _format_day(day):
-                    return dict(csv.reader(open('bot/support/yorku_days.csv', 'r'))).get(day, '')
+                    return dict(csv.reader(open('bot/support/days.csv', 'r'))).get(day, '')
 
                 def _format_times(time, duration):
                     def _format_time(time):
@@ -83,7 +84,7 @@ class Course(commands.Cog):
             \n\u2003\u2022 EECS 3311 \
             \n\u2003\u2022 LE EECS 3311 \
             \n\u2003\u2022 EECS 3311 FW 2020 \
-            \n\u2003\u2022 LE EECS 3311 FW 2020"  
+            \n\u2003\u2022 LE EECS 3311 FW 2020"
 
         course = ' '.join(context.message.content.split()[1:])
         info = re.match("".join((
@@ -91,15 +92,20 @@ class Course(commands.Cog):
             "(?P<course>[0-9]{4}))+"
             "(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?"
         )), course.lower())
-        courses, data = tee(scrape_course(info.groupdict()))
-        
-        if next(data, None) is None:
+        try:
+            courses, data = tee(scrape_course(info.groupdict()))
+
+            if next(data, None) is None:
+                raise Exception()
+            else:
+                for course_info in courses:
+                    for embed in _format_course(course_info):
+                        await context.channel.send(embed=embed)
+        except Exception:
             embed = discord.Embed(title="Error", description=error, color=0xff0000, inline=False)
-            await context.channel.send(embed=embed)
-        else:
-            for course_info in courses:
-                for embed in _format_course(course_info):
-                    await context.channel.send(embed=embed)
+            await context.channel.send(embed=embed)            
+        
+
 
 def setup(client):
     client.add_cog(Course(client))
