@@ -19,15 +19,15 @@ class Course(commands.Cog):
             if info.get('error', None) is not None:
                 return EmbedBuilder(title="Error", description=error, color=0xff0000, inline=False)
             else:
-                if sum([len(section[section_info][lecture]['lectures']) 
-                    for section in info['sections'] 
-                    for section_info in section 
+                if sum([len(section[section_info][lecture]['lectures'])
+                    for section in info['sections']
+                    for section_info in section
                     for lecture in section[section_info]
                 ]) > 0:
                     embeds = EmbedBuilder(
-                        title=info['heading'], 
+                        title=info['heading'],
                         description=info['description'],
-                        color=0x0000ff, 
+                        color=0x0000ff,
                         url=info['url'],
                         thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
                     )
@@ -46,7 +46,7 @@ class Course(commands.Cog):
 
             def _build_lecture(lecture):
                 def _format_day(day):
-                    return dict(csv.reader(open('bot/cogs/yorku_days.csv', 'r'))).get(day, '')
+                    return dict(csv.reader(open('bot/support/days.csv', 'r'))).get(day, '')
 
                 def _format_times(time, duration):
                     def _format_time(time):
@@ -85,7 +85,7 @@ class Course(commands.Cog):
             \n\u2003\u2022 EECS 3311 \
             \n\u2003\u2022 LE EECS 3311 \
             \n\u2003\u2022 EECS 3311 FW 2020 \
-            \n\u2003\u2022 LE EECS 3311 FW 2020"  
+            \n\u2003\u2022 LE EECS 3311 FW 2020"
 
         course = ' '.join(context.message.content.split()[1:])
         info = re.match("".join((

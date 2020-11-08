@@ -4,10 +4,9 @@ from itertools import islice
 import bs4
 import requests
 
-
 def scrape_course_list(course):
     def build_link(department, course=None, faculty=None, session=None, year=None):
-        faculty = faculty or dict(csv.reader(open('bot/scrapers/faculties.csv', 'r'))).get(department)
+        faculty = faculty or dict(csv.reader(open('bot/support/faculties.csv', 'r'))).get(department)
         yield f'faculty={faculty}'
         yield f'subject={department}'
         if session is not None and year is not None:
@@ -59,7 +58,7 @@ def scrape_course(course):
                         lec['Backup'] = 'backup'
                     sect[info][lect_type]['lectures'].append(lec)
         return sect
-        
+
 
     URLS = list(scrape_course_list(course))
 
