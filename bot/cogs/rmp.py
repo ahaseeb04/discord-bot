@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
 
-import scraper
+from scrapers import scrape_rmp
 
-class Rmp(commands.Cog):
+class RMP(commands.Cog):
     def __init__(self, client):
         self.client = client
 
@@ -12,7 +12,7 @@ class Rmp(commands.Cog):
         professor_name = context.message.content.lower().split()[1:]
 
         try:
-            data = scraper.scrape_rmp(professor_name)
+            data = scrape_rmp(professor_name)
 
             embed = discord.Embed(title=data['name'], url=data['url'], color=0x14532d)
             embed.set_thumbnail(url='https://i.imgur.com/0eDVqDp.png')
@@ -27,4 +27,4 @@ class Rmp(commands.Cog):
             await context.message.channel.send('**Error**: Sorry, could not find professor!')
 
 def setup(client):
-    client.add_cog(Rmp(client))
+    client.add_cog(RMP(client))

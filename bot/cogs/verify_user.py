@@ -15,10 +15,12 @@ class VerifyUser(commands.Cog):
     async def verify(self, context):
         def check_reaction(message):
             def check(reaction, user):
-                return reaction.message.id == message.id \
-                    and reaction.emoji == '👍' \
-                    and user.guild_permissions.manage_roles \
-                    and str(user.id) != config.bot_id
+                can_perform_action = reaction.message.id == message.id and user.guild_permissions.manage_roles and str(user.id) != config.bot_id
+
+                if reaction.emoji == '👍' and can_perform_action:
+                    return True
+                elif reaction.emoji == '👎' and can_perform_action:
+                    raise IllegalFormatException()
 
             return check
 
@@ -43,7 +45,13 @@ class VerifyUser(commands.Cog):
                 requested_roles = list(get_requested_roles())
 
                 await context.message.add_reaction(emoji='👍')
-                await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
+                await context.message.add_reaction(emoji='👎')
+
+                try:
+                    await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
+                except IllegalFormatException:
+                    await context.message.channel.send(f'<@{context.message.author.id}> Sorry, please read <#{config.verification_rules_channel}> and try again.')
+                    return
             except asyncio.TimeoutError as e:
                 pass
             else:
@@ -52,6 +60,9 @@ class VerifyUser(commands.Cog):
                         await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
 
                         print(f'{role} role assigned.')
+
+class IllegalFormatException(Exception):
+    pass
 
 def setup(client):
     client.add_cog(VerifyUser(client))
