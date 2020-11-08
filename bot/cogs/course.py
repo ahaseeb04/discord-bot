@@ -15,15 +15,14 @@ class EmbedBuilder():
             'color' : kwargs.get('color', ''),
             'title' : kwargs.get('title', ''),
             'url' : kwargs.get('url', ''),
-            'thumbnail' : kwargs.get('thumbnail', discord.Embed.Empty)
         }
         self.thumbnail = kwargs.pop('thumbnail', discord.Embed.Empty)
-        self.embeds = [discord.Embed(**kwargs).set_thumbnail(url=self.properties['thumbnail'])]
+        self.embeds = [discord.Embed(**kwargs).set_thumbnail(url=self.thumbnail)]
 
     def add_field(self, **kwargs):
         embed = self.embeds[-1]
         if len(embed.fields) == 25:
-            embed = discord.Embed(**self.properties).set_thumbnail(url=self.properties['thumbnail'])
+            embed = discord.Embed(**self.properties).set_thumbnail(url=self.thumbnail)
             self.embeds.append(embed)
         embed.add_field(**kwargs)
 
@@ -49,20 +48,25 @@ class GetCourse(commands.Cog):
             if info.get('error', None) is not None:
                 return EmbedBuilder(title="Error", description=error, color=0xff0000, inline=False)
             else:
-                embeds = EmbedBuilder(
-                    title=info['heading'], 
-                    description=info['description'],
-                    color=0x0000ff, 
-                    url=info['url'],
-                    thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
-                )
-                header = '\u200b'
-                for section in info['sections']:
-                    for sect in section:
-                        if sum([len(x) for l in section[sect] for x in section[sect][l]['lectures']]) > 0:
-                            embeds.add_field(name=header, value=f'___***{sect}***___', inline=False)
-                            embeds = build_embed(embeds, section[sect])
-                return embeds
+                if sum([len(section[section_info][lecture]['lectures']) 
+                    for section in info['sections'] 
+                    for section_info in section 
+                    for lecture in section[section_info]
+                ]) > 0:
+                    embeds = EmbedBuilder(
+                        title=info['heading'], 
+                        description=info['description'],
+                        color=0x0000ff, 
+                        url=info['url'],
+                        thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
+                    )
+                    for section in info['sections']:
+                        for section_info in section:
+                            if sum([len(x) for l in section[section_info] for x in section[section_info][l]['lectures']]) > 0:
+                                embeds.add_field(name='\u200b', value=f'___***{section_info}***___', inline=False)
+                                embeds = build_embed(embeds, section[section_info])
+                    return embeds
+                return []
 
         def build_embed(embeds, section):
             def build_lectures(lectures):
@@ -94,11 +98,11 @@ class GetCourse(commands.Cog):
                 yield format_location(lecture['Location'])
                 yield format_backup(lecture.get('Backup'))
 
-            for lect in section:
-                if len(section[lect]['lectures']) > 0:
+            for lecture in section:
+                if len(section[lecture]['lectures']) > 0:
                     embeds.add_field(
-                        name=f"{lect}: {section[lect].get('instructors', 'Not Available')}",
-                        value='\n'.join(build_lectures(section[lect]['lectures'])),
+                        name=f"{lecture}: {section[lecture].get('instructors', 'Not Available')}",
+                        value='\n'.join(build_lectures(section[lecture]['lectures'])),
                         inline=False
                     )
             return embeds
@@ -113,7 +117,11 @@ class GetCourse(commands.Cog):
             \n\u2003\u2022 LE EECS 3311 FW 2020"  
 
         course = ' '.join(context.message.content.split()[1:])
-        info = re.match("(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s?(?P<course>[0-9]{4}))+(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?", course.lower())
+        info = re.match("".join((
+            "(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s?"
+            "(?P<course>[0-9]{4}))+"
+            "(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?"
+        )), course.lower())
         listings = list(scraper.scrape_course(info.groupdict()))
         if not len(listings):
             embed = discord.Embed(title="Error", description=error, color=0xff0000, inline=False)
