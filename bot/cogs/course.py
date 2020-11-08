@@ -6,28 +6,8 @@ import discord
 from discord.ext import commands
 
 from scrapers import scrape_course
+from embed_builder import EmbedBuilder
 import config
-
-
-class EmbedBuilder():
-    def __init__(self, **kwargs):
-        self.properties = {
-            'color' : kwargs.get('color', ''),
-            'title' : kwargs.get('title', ''),
-            'url' : kwargs.get('url', ''),
-        }
-        self.thumbnail = kwargs.pop('thumbnail', discord.Embed.Empty)
-        self.embeds = [discord.Embed(**kwargs).set_thumbnail(url=self.thumbnail)]
-
-    def add_field(self, **kwargs):
-        embed = self.embeds[-1]
-        if len(embed.fields) == 25:
-            embed = discord.Embed(**self.properties).set_thumbnail(url=self.thumbnail)
-            self.embeds.append(embed)
-        embed.add_field(**kwargs)
-
-    def __iter__(self):
-        return iter(self.embeds)
 
 class Course(commands.Cog):
     def __init__(self, client):

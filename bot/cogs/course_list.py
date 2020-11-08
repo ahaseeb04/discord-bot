@@ -2,27 +2,7 @@ import discord
 from discord.ext import commands
 
 from scrapers import scrape_course_list
-
-class EmbedBuilder():
-    def __init__(self, **kwargs):
-        self.properties = {
-            'color' : kwargs.get('color', discord.Embed.Empty),
-            'title' : kwargs.get('title', ''),
-            'url' : kwargs.get('url', ''),
-            'thumbnail' : kwargs.get('thumbnail', discord.Embed.Empty)
-        }
-        self.thumbnail = kwargs.pop('thumbnail', discord.Embed.Empty)
-        self.embeds = [discord.Embed(**kwargs).set_thumbnail(url=self.properties['thumbnail'])]
-
-    def add_field(self, **kwargs):
-        embed = self.embeds[-1]
-        if len(embed.fields) == 25:
-            embed = discord.Embed(**self.properties).set_thumbnail(url=self.properties['thumbnail'])
-            self.embeds.append(embed)
-        embed.add_field(**kwargs)
-
-    def __iter__(self):
-        return iter(self.embeds)
+from embed_builder import EmbedBuilder
 
 class CourseList(commands.Cog):
     def __init__(self, client):
@@ -33,9 +13,9 @@ class CourseList(commands.Cog):
         courses = ' '.join(context.message.content.split()[1:])
         course_list = scrape_course_list({'department': courses})
 
-        embeds = EmbedBuilder()
+        embeds = EmbedBuilder(max_fields=24)
         for course in course_list:
-            embeds.add_field(name=course[0], value=course[1], inline=False)
+            embeds.add_field(name=course[0], value=course[1])
         for embed in embeds: 
             await context.channel.send(embed=embed)
 
