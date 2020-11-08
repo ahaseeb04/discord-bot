@@ -1,13 +1,14 @@
 import re
 import csv
 from datetime import datetime, timedelta
+from itertools import tee
 
 import discord
 from discord.ext import commands
 
 from scrapers import scrape_course
-from embed_builder import EmbedBuilder
-import config
+from bot.embed_builder import EmbedBuilder
+from bot import config
 
 class Course(commands.Cog):
     def __init__(self, client):
@@ -15,38 +16,37 @@ class Course(commands.Cog):
 
     @commands.command()
     async def course(self, context):
-        def _format_output(info):
-            if info.get('error', None) is not None:
+        def _format_course(course_info):
+            if course_info.get('error', None) is not None:
                 return EmbedBuilder(title="Error", description=error, color=0xff0000, inline=False)
             else:
-                if sum([len(section[section_info][lecture]['lectures']) 
-                    for section in info['sections'] 
-                    for section_info in section 
-                    for lecture in section[section_info]
-                ]) > 0:
+                if sum(
+                    len(lecture['lecture_info']) for section in course_info['sections']
+                    for lecture in section['lectures'].values()
+                ) > 0:
                     embeds = EmbedBuilder(
-                        title=info['heading'], 
-                        description=info['description'],
+                        title=course_info['heading'], 
+                        description=course_info['description'],
                         color=0x0000ff, 
-                        url=info['url'],
+                        url=course_info['url'],
                         thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
                     )
-                    for section in info['sections']:
-                        for section_info in section:
-                            if sum([len(x) for l in section[section_info] for x in section[section_info][l]['lectures']]) > 0:
-                                embeds.add_field(name='\u200b', value=f'___***{section_info}***___', inline=False)
-                                embeds = _build_embed(embeds, section[section_info])
+                    for section in course_info['sections']:
+                        if sum(len(lecture['lecture_info']) for lecture in section['lectures'].values()) > 0:
+                            embeds.add_field(name='\u200b', value=f"___***{section['section_info']}***___", inline=False)
+                            for name, value in _format_section(section):
+                                embeds.add_field(name=name, value=value, inline=False)
                     return embeds
                 return []
 
-        def _build_embed(embeds, section):
-            def _build_lectures(lectures):
+        def _format_section(section):
+            def _format_lectures(lectures):
                 for lecture in lectures:
-                    yield ' '.join(_build_lecture(lecture))
+                    yield ' '.join(_format_lecture(lecture))
 
-            def _build_lecture(lecture):
+            def _format_lecture(lecture):
                 def _format_day(day):
-                    return dict(csv.reader(open('bot/cogs/yorku_days.csv', 'r'))).get(day, '')
+                    return dict(csv.reader(open('bot/support/yorku_days.csv', 'r'))).get(day, '')
 
                 def _format_times(time, duration):
                     def _format_time(time):
@@ -62,21 +62,19 @@ class Course(commands.Cog):
                     return f'@{location}' if location != '\xa0 ' else ''
 
                 def _format_backup(backup):
-                    return f'- {backup}' if backup is not None else ''
+                    return f' ({backup})' if backup is not None else ''
 
                 yield _format_day(lecture['Day'])
                 yield _format_times(lecture['Start Time'], lecture['Duration'])
                 yield _format_location(lecture['Location'])
                 yield _format_backup(lecture.get('Backup'))
 
-            for lecture in section:
-                if len(section[lecture]['lectures']) > 0:
-                    embeds.add_field(
-                        name=f"{lecture}: {section[lecture].get('instructors', 'Not Available')}",
-                        value='\n'.join(_build_lectures(section[lecture]['lectures'])),
-                        inline=False
+            for name, lecture in section['lectures'].items():
+                if len(lecture) > 0:
+                    yield (
+                        f"{name}: {lecture.get('instructors', 'Not Available')}",
+                        '\n'.join(_format_lectures(lecture['lecture_info'])),
                     )
-            return embeds
 
         error = "The requested course was not found. \n\
             \nCourses should be of the form: \
@@ -93,13 +91,14 @@ class Course(commands.Cog):
             "(?P<course>[0-9]{4}))+"
             "(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?"
         )), course.lower())
-        listings = list(scrape_course(info.groupdict()))
-        if not len(listings):
+        courses, data = tee(scrape_course(info.groupdict()))
+        
+        if next(data, None) is None:
             embed = discord.Embed(title="Error", description=error, color=0xff0000, inline=False)
             await context.channel.send(embed=embed)
         else:
-            for listing in listings:
-                for embed in _format_output(listing):
+            for course_info in courses:
+                for embed in _format_course(course_info):
                     await context.channel.send(embed=embed)
 
 def setup(client):

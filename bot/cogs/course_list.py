@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 from scrapers import scrape_course_list
-from embed_builder import EmbedBuilder
+from bot.embed_builder import EmbedBuilder
 
 class CourseList(commands.Cog):
     def __init__(self, client):

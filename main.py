@@ -4,8 +4,8 @@ import csv
 import discord
 from discord.ext import commands
 
-import cogs
-import config
+import bot.cogs as cogs
+import bot.config as config
 
 intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, presences=True)
 client = commands.Bot(command_prefix=';', intents=intents)

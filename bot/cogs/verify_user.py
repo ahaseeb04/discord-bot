@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz
 from discord.utils import get
 from discord.ext import commands
 
-import config
+from bot import config
 
 class VerifyUser(commands.Cog):
     def __init__(self, client):
@@ -38,7 +38,7 @@ class VerifyUser(commands.Cog):
         if context.message.channel.name == config.verification_channel:
             try:
                 roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
-                aliases = { key : value.strip() for key, value in csv.reader(open('bot/aliases.csv', 'r')) }
+                aliases = { key : value.strip() for key, value in csv.reader(open('bot/support/aliases.csv', 'r')) }
 
                 roles = { **roles, **aliases }
 
