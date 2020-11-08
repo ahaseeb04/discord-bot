@@ -7,7 +7,7 @@ import requests
 
 def scrape_course_list(course):
     def build_link(department, course=None, faculty=None, session=None, year=None):
-        faculty = faculty or dict(csv.reader(open('bot/yorku_scraper/faculties.csv', 'r'))).get(department)
+        faculty = faculty or dict(csv.reader(open('bot/scrapers/faculties.csv', 'r'))).get(department)
         yield f'faculty={faculty}'
         yield f'subject={department}'
         if session is not None and year is not None:

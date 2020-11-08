@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import discord
 from discord.ext import commands
 
-from yorku_scraper import scrape_course
+from scrapers import scrape_course
 import config
 
 

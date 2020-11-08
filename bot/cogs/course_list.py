@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands
 
-from yorku_scraper import scrape_course_list
+from scrapers import scrape_course_list
 
 class EmbedBuilder():
     def __init__(self, **kwargs):
