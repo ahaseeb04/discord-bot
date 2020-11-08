@@ -50,7 +50,8 @@ class VerifyUser(commands.Cog):
                 try:
                     await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
                 except IllegalFormatException:
-                    await context.message.channel.send(f'<@{context.message.author.id}> Sorry, please read <#{config.verification_rules_channel}> and try again.')
+                    channel = self.client.get_channel(int(config.verification_rules_channel))
+                    await context.message.channel.send(f'{context.message.author.mention} Sorry, please read {channel.mention} and try again.')
                     return
             except asyncio.TimeoutError as e:
                 pass
