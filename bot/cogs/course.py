@@ -29,7 +29,7 @@ class EmbedBuilder():
     def __iter__(self):
         return iter(self.embeds)
 
-class GetCourse(commands.Cog):
+class Course(commands.Cog):
     def __init__(self, client):
         self.client = client
 
@@ -123,4 +123,4 @@ class GetCourse(commands.Cog):
                     await context.channel.send(embed=embed)
 
 def setup(client):
-    client.add_cog(GetCourse(client))
+    client.add_cog(Course(client))
