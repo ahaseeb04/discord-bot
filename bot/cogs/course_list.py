@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands
 
-import scraper
+from yorku_scraper import scrape_course_list
 
 class EmbedBuilder():
     def __init__(self, **kwargs):
@@ -32,7 +32,7 @@ class CourseList(commands.Cog):
     @commands.command()
     async def courselist(self, context):
         courses = ' '.join(context.message.content.split()[1:])
-        course_list = scraper.scrape_course_list({'department': courses})
+        course_list = scrape_course_list({'department': courses})
 
         embeds = EmbedBuilder()
         for course in course_list:
