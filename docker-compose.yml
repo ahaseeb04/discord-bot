@@ -4,4 +4,3 @@ services:
         build: .
         volumes:
             - ${PWD}:/usr/src/app
-        command: python -u main.py
