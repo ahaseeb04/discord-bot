@@ -5,7 +5,8 @@ from fuzzywuzzy import fuzz
 from discord.utils import get
 from discord.ext import commands
 
-import config
+from bot import config
+from bot.exceptions import IllegalFormatException
 
 class VerifyUser(commands.Cog):
     def __init__(self, client):
@@ -63,8 +64,8 @@ class VerifyUser(commands.Cog):
 
                         print(f'{role} role assigned.')
 
-class IllegalFormatException(Exception):
-    pass
+# class IllegalFormatException(Exception):
+#     pass
 
 def setup(client):
     client.add_cog(VerifyUser(client))

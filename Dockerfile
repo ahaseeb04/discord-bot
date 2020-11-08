@@ -6,6 +6,8 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY bot/ .
+COPY main.py .
+COPY bot bot/.
+COPY scrapers scrapers/.
 
-CMD [ "python", "-u", "bot/main.py" ]
+CMD python -u main.py

@@ -2,6 +2,5 @@ version: "3.5"
 services:
     bot:
         build: .
-        working_dir: /usr/src/app
         volumes:
             - ${PWD}:/usr/src/app

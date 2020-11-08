@@ -1,0 +1,2 @@
+class IllegalFormatException(Exception):
+    pass
