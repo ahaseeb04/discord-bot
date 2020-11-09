@@ -9,7 +9,6 @@ from discord.ext import commands
 from scrapers import scrape_course
 from bot import config
 from bot.embed_builder import EmbedBuilder
-from bot.exceptions import IllegalFormatException
 
 class Course(commands.Cog, name="course"):
     def __init__(self, client):
@@ -88,14 +87,14 @@ class Course(commands.Cog, name="course"):
 
         course = ' '.join(context.message.content.split()[1:])
         info = re.match("".join((
-            "(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s?"
-            "(?P<course>[0-9]{4}))+"
-            "(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?"
+            "^(?:(?P<faculty>[a-z]{2})\s)?"
+            "(?:(?P<department>[a-z]{2,4})\s?(?P<course>[0-9]{4}))+"
+            "(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?$"
         )), course.lower())
         try:
-            courses, data = tee(scrape_course(info.groupdict()))
+            courses, test = tee(scrape_course(info.groupdict()))
 
-            if next(data, None) is None:
+            if next(test, None) is None:
                 raise Exception()
             else:
                 for course_info in courses:
@@ -104,8 +103,6 @@ class Course(commands.Cog, name="course"):
         except Exception:
             embed = discord.Embed(title="Error", description=error, color=0xff0000, inline=False)
             await context.channel.send(embed=embed)
-
-
 
 def setup(client):
     client.add_cog(Course(client))
