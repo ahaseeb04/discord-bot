@@ -6,11 +6,9 @@ from discord.ext import commands
 
 from scrapers import scrape_course_list
 from bot.embed_builder import EmbedBuilder
+from ._cog import _Cog
 
-class CourseList(commands.Cog, name="course list"):
-    def __init__(self, client):
-        self.client = client
-
+class CourseList(_Cog, name="course list"):
     @commands.command(brief='Fetch all the courses for a specified program.')
     async def courselist(self, context):
         error = "The requested course list was not found. \n\
@@ -43,6 +41,3 @@ class CourseList(commands.Cog, name="course list"):
         except Exception:
             embed = discord.Embed(title="Error", description=error, color=0xff0000, inline=False)
             await context.channel.send(embed=embed)
-
-def setup(client):
-    client.add_cog(CourseList(client))
