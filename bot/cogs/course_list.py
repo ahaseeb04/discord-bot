@@ -7,7 +7,7 @@ from discord.ext import commands
 from scrapers import scrape_course_list
 from bot.embed_builder import EmbedBuilder
 
-class CourseList(commands.Cog):
+class CourseList(commands.Cog, name="course list"):
     def __init__(self, client):
         self.client = client
 
