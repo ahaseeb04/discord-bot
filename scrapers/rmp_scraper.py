@@ -6,9 +6,8 @@ def get_professor_id(professor_name):
     page = requests.get(url)
 
     soup = bs4.BeautifulSoup(page.content, 'html.parser')
-    results = soup.find_all('li', class_='listing')
 
-    for result in results:
+    for result in soup.find_all('li', class_='listing'):
         institution = result.find('span', class_='sub').text.lower()
         if 'york university' in institution and 'new' not in institution:
             return result.find('a')['href']

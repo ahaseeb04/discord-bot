@@ -8,7 +8,7 @@ class CourseList(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @commands.command(brief='Fetch all the courses for a specified program.')
     async def courselist(self, context):
         courses = ' '.join(context.message.content.split()[1:])
 

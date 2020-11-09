@@ -7,15 +7,15 @@ import discord
 from discord.ext import commands
 
 from scrapers import scrape_course
-from bot import config 
+from bot import config
 from bot.embed_builder import EmbedBuilder
 from bot.exceptions import IllegalFormatException
 
-class Course(commands.Cog):
+class Course(commands.Cog, name="course"):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @commands.command(brief='Fetch information regarding a course from YorkU.')
     async def course(self, context):
         def _format_course(course_info):
             if course_info.get('error', None) is not None:
@@ -26,9 +26,9 @@ class Course(commands.Cog):
                     for lecture in section['lectures'].values()
                 ) > 0:
                     embeds = EmbedBuilder(
-                        title=course_info['heading'], 
+                        title=course_info['heading'],
                         description=course_info['description'],
-                        color=0x0000ff, 
+                        color=0x0000ff,
                         url=course_info['url'],
                         thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
                     )
@@ -103,8 +103,8 @@ class Course(commands.Cog):
                         await context.channel.send(embed=embed)
         except Exception:
             embed = discord.Embed(title="Error", description=error, color=0xff0000, inline=False)
-            await context.channel.send(embed=embed)            
-        
+            await context.channel.send(embed=embed)
+
 
 
 def setup(client):

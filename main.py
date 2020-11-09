@@ -12,7 +12,7 @@ client = commands.Bot(command_prefix=';', intents=intents)
 
 @client.event
 async def on_ready():
-    print('Ready.')
+    print('Ready!')
 
 if __name__ == "__main__":
     for name, cog in inspect.getmembers(cogs, inspect.isclass):

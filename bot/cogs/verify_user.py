@@ -8,11 +8,11 @@ from discord.ext import commands
 from bot import config
 from bot.exceptions import IllegalFormatException
 
-class VerifyUser(commands.Cog):
+class VerifyUser(commands.Cog, name="verify"):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @commands.command(brief='Request roles for yourself.')
     async def verify(self, context):
         def check_reaction(message):
             def check(reaction, user):
@@ -36,7 +36,7 @@ class VerifyUser(commands.Cog):
 
                 yield requested
 
-        if context.message.channel.name == config.verification_channel:
+        if context.message.channel.id == int(config.verification_channel):
             try:
                 roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
                 aliases = { key : value.strip() for key, value in csv.reader(open('bot/support/aliases.csv', 'r')) }
@@ -63,9 +63,6 @@ class VerifyUser(commands.Cog):
                         await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
 
                         print(f'{role} role assigned.')
-
-# class IllegalFormatException(Exception):
-#     pass
 
 def setup(client):
     client.add_cog(VerifyUser(client))

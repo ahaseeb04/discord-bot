@@ -3,11 +3,11 @@ from discord.ext import commands
 
 from scrapers import scrape_rmp
 
-class RMP(commands.Cog):
+class RMP(commands.Cog, name="rmp"):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @commands.command(brief='Fetch a professor\'s information from RateMyProfessors.')
     async def rmp(self, context):
         professor_name = context.message.content.lower().split()[1:]
 
