@@ -4,8 +4,8 @@ import csv
 import discord
 from discord.ext import commands
 
-import bot.cogs as cogs
-import bot.config as config
+from bot import config, cogs
+from bot.cogs._cog import _Cog
 
 intents = discord.Intents(messages=True, guilds=True, reactions=True, members=True, presences=True)
 client = commands.Bot(command_prefix=';', intents=intents)
@@ -15,8 +15,7 @@ async def on_ready():
     print('Ready!')
 
 if __name__ == "__main__":
-    for name, cog in inspect.getmembers(cogs, inspect.isclass):
-        if isinstance(cog, type(commands.Cog)):
-            client.load_extension(cog.__module__)
+    for cog in _Cog.__subclasses__():
+        client.add_cog(cog(client))
 
     client.run(config.token)

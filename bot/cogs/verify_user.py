@@ -7,11 +7,9 @@ from discord.ext import commands
 
 from bot import config
 from bot.exceptions import IllegalFormatException
+from ._cog import _Cog
 
-class VerifyUser(commands.Cog, name="verify"):
-    def __init__(self, client):
-        self.client = client
-
+class VerifyUser(_Cog, name="verify"):
     @commands.command(brief='Request roles for yourself.')
     async def verify(self, context):
         def check_reaction(message):
@@ -56,13 +54,10 @@ class VerifyUser(commands.Cog, name="verify"):
 
                     return
             except asyncio.TimeoutError as e:
-                pass
+                print(e)
             else:
                 for requested in requested_roles:
                     if requested is not None and len(role := roles.get(requested[1])):
                         await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
 
                         print(f'{role} role assigned.')
-
-def setup(client):
-    client.add_cog(VerifyUser(client))

@@ -2,11 +2,9 @@ import discord
 from discord.ext import commands
 
 from scrapers import scrape_rmp
+from ._cog import _Cog
 
-class RMP(commands.Cog, name="rmp"):
-    def __init__(self, client):
-        self.client = client
-
+class RMP(_Cog, name='rmp'):
     @commands.command(brief='Fetch a professor\'s information from RateMyProfessors.')
     async def rmp(self, context):
         professor_name = context.message.content.lower().split()[1:]
@@ -25,6 +23,3 @@ class RMP(commands.Cog, name="rmp"):
             await context.message.channel.send(embed=embed)
         except Exception:
             await context.message.channel.send('**Error**: Sorry, could not find professor!')
-
-def setup(client):
-    client.add_cog(RMP(client))
