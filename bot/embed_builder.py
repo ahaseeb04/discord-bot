@@ -18,5 +18,12 @@ class EmbedBuilder():
             self.embeds.append(embed)
         embed.add_field(**kwargs)
 
+    def merge_fields(self, embed):
+        for field in embed.get_fields():
+            self.add_field(name=field.name, value=field.value, inline=field.inline)
+
+    def get_fields(self):
+        return [field for embed in self.embeds for field in embed.fields]
+
     def __iter__(self):
         return iter(self.embeds)
