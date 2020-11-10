@@ -1,6 +1,6 @@
 import bs4
 import requests
-from bot.exceptions import DataNotFoundException
+from bot.exceptions import DataNotFoundError
 
 def get_professor_id(professor_name):
     url = 'https://www.ratemyprofessors.com/search.jsp?query=' + '+'.join(s for s in professor_name)
@@ -12,7 +12,7 @@ def get_professor_id(professor_name):
         institution = result.find('span', class_='sub').text.lower()
         if 'york university' in institution and 'new' not in institution:
             return result.find('a')['href']
-    raise DataNotFoundException()
+    raise DataNotFoundError()
 
 def scrape_rmp(professor_name):
     search = lambda e, s: e.startswith(s) if e else False

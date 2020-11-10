@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 from scrapers import scrape_rmp
-from bot.exceptions import DataNotFoundException
+from bot.exceptions import DataNotFoundError
 from ._cog import _Cog
 
 class RMP(_Cog, name='rmp'):
@@ -11,7 +11,9 @@ class RMP(_Cog, name='rmp'):
         professor_name = context.message.content.lower().split()[1:]
         try:
             data = scrape_rmp(professor_name)
-
+        except DataNotFoundError:
+            await context.message.channel.send('**Error**: Sorry, could not find professor!')
+        else:
             embed = discord.Embed(title=data['name'], url=data['url'], color=0x14532d)
             embed.set_thumbnail(url='https://i.imgur.com/0eDVqDp.png')
 
@@ -21,5 +23,3 @@ class RMP(_Cog, name='rmp'):
             embed.add_field(name='Would take again', value=data['take_again'], inline=False)
 
             await context.message.channel.send(embed=embed)
-        except DataNotFoundException:
-            await context.message.channel.send('**Error**: Sorry, could not find professor!')
