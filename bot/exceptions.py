@@ -4,5 +4,5 @@ class IllegalFormatException(Exception):
 class NotApprovedException(Exception):
     pass
 
-class CourseNotFoundException(Exception):
+class DataNotFoundException(Exception):
     pass

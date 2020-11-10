@@ -7,8 +7,10 @@ import discord
 from discord.ext import commands
 
 from scrapers import scrape_course
-from bot.exceptions import CourseNotFoundException
 from bot import config
+from bot.exceptions import DataNotFoundException, IllegalFormatException
+from bot.errors import course_error
+from bot.regex import course_regex
 from bot.embed_builder import EmbedBuilder
 from ._cog import _Cog
 
@@ -71,30 +73,20 @@ class Course(_Cog, name="course"):
                         '\n'.join(_format_lectures(lecture['lecture_info'])),
                     )
 
-        error = "The requested course was not found. \n\
-            \nCourses should be of the form: \
-            \n\u2003\u2002[faculty] dept course [session year] \n\
-            \nExamples: \
-            \n\u2003\u2022 EECS 3311 \
-            \n\u2003\u2022 LE EECS 3311 \
-            \n\u2003\u2022 EECS 3311 FW 2020 \
-            \n\u2003\u2022 LE EECS 3311 FW 2020"
-
         course = ' '.join(context.message.content.split()[1:])
-        info = re.match("".join((
-            "^(?:(?P<faculty>[a-z]{2})\s)?"
-            "(?:(?P<department>[a-z]{2,4})\s?(?P<course>[0-9]{4}))+"
-            "(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?$"
-        )), course.lower())
-        try:
-            courses, test = tee(scrape_course(info.groupdict()))
+        info = re.match(course_regex, course.lower())
 
+        try:
+            if info is None:
+                raise IllegalFormatException()
+
+            courses, test = tee(scrape_course(info.groupdict()))
             if next(test, None) is None:
-                raise CourseNotFoundException()
-            else:
-                for course_info in courses:
-                    for embed in _format_course(course_info):
-                        await context.channel.send(embed=embed)
-        except CourseNotFoundException:
-            embed = discord.Embed(title="Error", description=error, color=0xff0000, inline=False)
+                raise DataNotFoundException()
+
+            for course_info in courses:
+                for embed in _format_course(course_info):
+                    await context.channel.send(embed=embed)
+        except (DataNotFoundException, IllegalFormatException):
+            embed = discord.Embed(title="Error", description=course_error, color=0xff0000, inline=False)
             await context.channel.send(embed=embed)
