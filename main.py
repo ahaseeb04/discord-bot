@@ -16,6 +16,7 @@ async def on_ready():
 
 if __name__ == "__main__":
     for cog in _Cog.__subclasses__():
+        print(cog)
         client.add_cog(cog(client))
 
     client.run(config.token)
