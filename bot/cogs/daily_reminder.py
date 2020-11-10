@@ -13,5 +13,5 @@ class DailyReminder(_Cog, name='js'):
         aiocron.crontab('0 10 * * * 1', func=self.daily_reminder, start=True, tz=timezone('US/Eastern'))
 
     async def daily_reminder(self):
-        await self.client.get_channel(int(config.cs_channel)).send("Daily Reminder js is ass")
+        await self.client.get_channel(int(config.cs_channel)).send("Daily reminder js is ass")
 
