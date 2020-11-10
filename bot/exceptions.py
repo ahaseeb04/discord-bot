@@ -3,3 +3,6 @@ class IllegalFormatException(Exception):
 
 class NotApprovedException(Exception):
     pass
+
+class DataNotFoundException(Exception):
+    pass
