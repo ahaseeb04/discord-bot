@@ -6,20 +6,23 @@ from discord.utils import get
 from discord.ext import commands
 
 from bot import config
-from bot.exceptions import IllegalFormatException
 from ._cog import _Cog
+from bot.exceptions import IllegalFormatException, NotApprovedException
 
 class VerifyUser(_Cog, name="verify"):
     @commands.command(brief='Request roles for yourself.')
     async def verify(self, context):
         def check_reaction(message):
             def check(reaction, user):
-                can_perform_action = reaction.message.id == message.id and user.guild_permissions.manage_roles and str(user.id) != config.bot_id
+                can_manage_roles = reaction.message.id == message.id and user.guild_permissions.manage_roles and str(user.id) != config.bot_id
+                can_kick_members = reaction.message.id == message.id and user.guild_permissions.kick_members and str(user.id) != config.bot_id
 
-                if reaction.emoji == '👍' and can_perform_action:
+                if reaction.emoji == '👍' and can_manage_roles:
                     return True
-                elif reaction.emoji == '👎' and can_perform_action:
+                elif reaction.emoji == '👎' and can_manage_roles:
                     raise IllegalFormatException()
+                elif reaction.emoji == '❌' and can_kick_members:
+                    raise NotApprovedException()
 
             return check
 
@@ -45,12 +48,18 @@ class VerifyUser(_Cog, name="verify"):
 
                 await context.message.add_reaction(emoji='👍')
                 await context.message.add_reaction(emoji='👎')
+                await context.message.add_reaction(emoji='❌')
 
                 try:
                     await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
                 except IllegalFormatException:
                     channel = self.client.get_channel(int(config.verification_rules_channel))
-                    await context.message.channel.send(f'{context.message.author.mention} Sorry, please read {channel.mention} and try again!')
+                    await context.message.channel.send(f'{context.message.author.mention} Sorry, please check {channel.mention} and try again!')
+
+                    return
+                except NotApprovedException:
+                    await context.message.author.kick()
+                    await context.message.channel.send(f'{context.message.author} has been kicked from server.')
 
                     return
             except asyncio.TimeoutError as e:
