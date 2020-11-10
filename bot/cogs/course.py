@@ -8,7 +8,7 @@ from discord.ext import commands
 
 from scrapers import scrape_course
 from bot import config
-from bot.exceptions import DataNotFoundException, IllegalFormatException
+from bot.exceptions import DataNotFoundError, IllegalFormatError
 from bot.errors import course_error
 from bot.regex import course_regex
 from bot.embed_builder import EmbedBuilder
@@ -78,15 +78,16 @@ class Course(_Cog, name="course"):
 
         try:
             if info is None:
-                raise IllegalFormatException()
+                raise IllegalFormatError()
 
             courses, test = tee(scrape_course(info.groupdict()))
             if next(test, None) is None:
-                raise DataNotFoundException()
+                raise DataNotFoundError()
 
+        except (DataNotFoundError, IllegalFormatError):
+            embed = discord.Embed(title="Error", description=course_error, color=0xff0000, inline=False)
+            await context.channel.send(embed=embed)
+        else:
             for course_info in courses:
                 for embed in _format_course(course_info):
                     await context.channel.send(embed=embed)
-        except (DataNotFoundException, IllegalFormatException):
-            embed = discord.Embed(title="Error", description=course_error, color=0xff0000, inline=False)
-            await context.channel.send(embed=embed)

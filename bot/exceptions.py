@@ -1,8 +1,8 @@
-class IllegalFormatException(Exception):
+class IllegalFormatError(Exception):
     pass
 
-class NotApprovedException(Exception):
+class NotApprovedError(Exception):
     pass
 
-class DataNotFoundException(Exception):
+class DataNotFoundError(Exception):
     pass
