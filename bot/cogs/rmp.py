@@ -1,5 +1,3 @@
-from itertools import tee
-
 import discord
 from discord.ext import commands
 
