@@ -6,7 +6,7 @@ from discord.utils import get
 from discord.ext import commands
 
 from bot import config
-from bot.exceptions import IllegalFormatError, NotApprovedError
+from bot.exceptions import IllegalFormatError, NotApprovedError, WrongchannelError
 from ._cog import _Cog
 
 class VerifyUser(_Cog, name="verify"):
@@ -36,32 +36,37 @@ class VerifyUser(_Cog, name="verify"):
                     requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requested_role.lower())) > 70), default=None)
 
                 yield requested
+        
+        try:
+            if context.message.channel.id != int(config.verification_channel):
+                raise WrongchannelError()
 
-        if context.message.channel.id == int(config.verification_channel):
-            try:
-                roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
-                aliases = { key : value.strip() for key, value in csv.reader(open('bot/support/aliases.csv', 'r')) }
+            roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
+            aliases = { key : value.strip() for key, value in csv.reader(open('bot/support/aliases.csv', 'r')) }
 
-                roles = { **roles, **aliases }
+            roles = { **roles, **aliases }
 
-                requested_roles = list(get_requested_roles())
+            requested_roles = list(get_requested_roles())
 
-                await context.message.add_reaction(emoji='👍')
-                await context.message.add_reaction(emoji='👎')
-                await context.message.add_reaction(emoji='❌')
+            await context.message.add_reaction(emoji='👍')
+            await context.message.add_reaction(emoji='👎')
+            await context.message.add_reaction(emoji='❌')
 
-                await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message)) 
-            except IllegalFormatError:
-                channel = self.client.get_channel(int(config.verification_rules_channel))
-                await context.message.channel.send(f'{context.message.author.mention} Sorry, please check {channel.mention} and try again!')
-            except NotApprovedError:
-                await context.message.author.kick()
-                await context.message.channel.send(f'{context.message.author} has been kicked from server.')
-            except asyncio.TimeoutError as e:
-                print(e)
-            else:
-                for requested in requested_roles:
-                    if requested is not None and len(role := roles.get(requested[1])):
-                        await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
+            await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message)) 
+        except IllegalFormatError:
+            channel = self.client.get_channel(int(config.verification_rules_channel))
+            await context.message.channel.send(f'{context.message.author.mention} Sorry, please check {channel.mention} and try again!')
+        except NotApprovedError:
+            await context.message.author.kick()
+            await context.message.channel.send(f'{context.message.author} has been kicked from server.')
+        except WrongchannelError:
+            channel = self.client.get_channel(int(config.verification_channel))
+            await context.message.channel.send(f'Command "verify" can only be used in {channel.mention}')
+        except asyncio.TimeoutError as e:
+            print(e)
+        else:
+            for requested in requested_roles:
+                if requested is not None and len(role := roles.get(requested[1])):
+                    await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
 
-                        print(f'{role} role assigned.')
+                    print(f'{role} role assigned.')
