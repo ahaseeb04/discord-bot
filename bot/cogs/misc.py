@@ -7,6 +7,18 @@ import aiocron
 from ._cog import _Cog
 from bot import config
 
+class Main(_Cog):
+    @_Cog.listener()
+    async def on_ready(self):
+        print("Ready!")
+
+    @_Cog.listener()
+    async def on_command_error(self, context, error):
+        if isinstance(error, commands.CommandNotFound):
+            await context.message.channel.send(error)
+        else:
+            print(error)
+
 class DailyReminder(_Cog, name='js'):
     def __init__(self, client):
         _Cog.__init__(self, client)
