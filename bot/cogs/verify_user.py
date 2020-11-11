@@ -6,22 +6,22 @@ from discord.utils import get
 from discord.ext import commands
 
 from bot import config
-from ._cog import _Cog
 from bot.exceptions import IllegalFormatError, NotApprovedError
+from ._cog import _Cog
 
 class VerifyUser(_Cog, name="verify"):
     @commands.command(brief='Request roles for yourself.')
     async def verify(self, context):
         def check_reaction(message):
             def check(reaction, user):
-                has_valid_permissions = lambda perms: getattr(user.guild_permissions, perms) and str(user.id) != config.bot_id
+                has_permissions = lambda perms: getattr(user.guild_permissions, perms) and str(user.id) != config.bot_id
                 is_correct_reaction = lambda emoji: reaction.message.id == message.id and reaction.emoji == emoji
 
-                if is_correct_reaction('👍') and has_valid_permissions('manage_roles'):
+                if is_correct_reaction('👍') and has_permissions('manage_roles'):
                     return True
-                elif is_correct_reaction('👎') and has_valid_permissions('manage_roles'):
+                if is_correct_reaction('👎') and has_permissions('manage_roles'):
                     raise IllegalFormatError()
-                elif is_correct_reaction('❌') and has_valid_permissions('kick_members'):
+                if is_correct_reaction('❌') and has_permissions('kick_members'):
                     raise NotApprovedError()
 
             return check
