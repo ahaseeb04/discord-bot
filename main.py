@@ -14,6 +14,10 @@ client = commands.Bot(command_prefix=';', intents=intents)
 async def on_ready():
     print('Ready!')
 
+@client.event
+async def on_command_error(context, error):
+    await context.message.channel.send(error)
+
 if __name__ == "__main__":
     for cog in _Cog.__subclasses__():
         print(cog)
