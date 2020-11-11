@@ -1,5 +1,6 @@
 import bs4
 import requests
+
 from bot.exceptions import DataNotFoundError
 
 def get_professor_id(professor_name):

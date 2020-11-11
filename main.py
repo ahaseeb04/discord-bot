@@ -16,7 +16,10 @@ async def on_ready():
 
 @client.event
 async def on_command_error(context, error):
-    await context.message.channel.send(error)
+    if isinstance(error, commands.CommandNotFound):
+        await context.message.channel.send(error)
+    else:
+        print(error)
 
 if __name__ == "__main__":
     for cog in _Cog.__subclasses__():
