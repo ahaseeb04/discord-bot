@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from bot import config
 from ._cog import _Cog
-from bot.exceptions import IllegalFormatException, NotApprovedException
+from bot.exceptions import IllegalFormatError, NotApprovedError
 
 class VerifyUser(_Cog, name="verify"):
     @commands.command(brief='Request roles for yourself.')
@@ -20,9 +20,9 @@ class VerifyUser(_Cog, name="verify"):
                 if is_correct_reaction('👍') and has_valid_permissions('manage_roles'):
                     return True
                 elif is_correct_reaction('👎') and has_valid_permissions('manage_roles'):
-                    raise IllegalFormatException()
+                    raise IllegalFormatError()
                 elif is_correct_reaction('❌') and has_valid_permissions('kick_members'):
-                    raise NotApprovedException()
+                    raise NotApprovedError()
 
             return check
 
@@ -51,10 +51,10 @@ class VerifyUser(_Cog, name="verify"):
                 await context.message.add_reaction(emoji='❌')
 
                 await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message)) 
-            except IllegalFormatException:
+            except IllegalFormatError:
                 channel = self.client.get_channel(int(config.verification_rules_channel))
                 await context.message.channel.send(f'{context.message.author.mention} Sorry, please check {channel.mention} and try again!')
-            except NotApprovedException:
+            except NotApprovedError:
                 await context.message.author.kick()
                 await context.message.channel.send(f'{context.message.author} has been kicked from server.')
             except asyncio.TimeoutError as e:
