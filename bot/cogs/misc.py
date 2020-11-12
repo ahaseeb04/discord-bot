@@ -3,6 +3,7 @@ from random import randrange
 
 import discord
 from discord.ext import tasks, commands
+from discord.utils import get
 import aiocron
 
 from ._cog import _Cog
@@ -31,5 +32,6 @@ class DailyReminder(_Cog, name='js'):
 class StfuuuuuAunk(_Cog):
     @_Cog.listener(name='on_message')
     async def stfuuuuu_aunk(self, message):
+        role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
         if config.stfuuuuu_aunk in { str(role.id) for role in message.author.roles } and not randrange(25):
-            await message.channel.send("stfuuuuu Aunk")
+            await message.channel.send(role.mention)
