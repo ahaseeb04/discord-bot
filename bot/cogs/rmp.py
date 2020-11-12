@@ -6,7 +6,7 @@ from bot.exceptions import DataNotFoundError
 from ._cog import _Cog
 
 class RMP(_Cog, name='rmp'):
-    @commands.command(brief='Fetch a professor\'s information from RateMyProfessors.')
+    @commands.command(brief="Fetch a professor's information from RateMyProfessors.")
     async def rmp(self, context):
         professor_name = context.message.content.lower().split()[1:]
         try:

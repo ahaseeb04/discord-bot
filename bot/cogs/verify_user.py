@@ -6,7 +6,7 @@ from discord.utils import get
 from discord.ext import commands
 
 from bot import config
-from bot.exceptions import IllegalFormatError, NotApprovedError, WrongchannelError
+from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError
 from ._cog import _Cog
 
 class VerifyUser(_Cog, name="verify"):
@@ -36,7 +36,7 @@ class VerifyUser(_Cog, name="verify"):
                     requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requested_role.lower())) > 70), default=None)
 
                 yield requested
-        
+
         try:
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongchannelError()
@@ -52,14 +52,14 @@ class VerifyUser(_Cog, name="verify"):
             await context.message.add_reaction(emoji='👎')
             await context.message.add_reaction(emoji='❌')
 
-            await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message)) 
+            await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
         except IllegalFormatError:
             channel = self.client.get_channel(int(config.verification_rules_channel))
             await context.message.channel.send(f'{context.message.author.mention} Sorry, please check {channel.mention} and try again!')
         except NotApprovedError:
             await context.message.author.kick()
             await context.message.channel.send(f'{context.message.author} has been kicked from server.')
-        except WrongchannelError:
+        except WrongChannelError:
             channel = self.client.get_channel(int(config.verification_channel))
             await context.message.channel.send(f'Command "verify" can only be used in {channel.mention}')
         except asyncio.TimeoutError as e:

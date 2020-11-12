@@ -7,5 +7,5 @@ class NotApprovedError(Exception):
 class DataNotFoundError(Exception):
     pass
 
-class WrongchannelError(Exception):
+class WrongChannelError(Exception):
     pass

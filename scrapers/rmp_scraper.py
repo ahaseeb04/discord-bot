@@ -13,6 +13,7 @@ def get_professor_id(professor_name):
         institution = result.find('span', class_='sub').text.lower()
         if 'york university' in institution and 'new' not in institution:
             return result.find('a')['href']
+
     raise DataNotFoundError()
 
 def scrape_rmp(professor_name):
