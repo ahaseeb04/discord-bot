@@ -32,6 +32,7 @@ class DailyReminder(_Cog, name='js'):
 class StfuuuuuAunk(_Cog):
     @_Cog.listener(name='on_message')
     async def stfuuuuu_aunk(self, message):
-        role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
-        if config.stfuuuuu_aunk in { str(role.id) for role in message.author.roles } and not randrange(25):
+        chance = 1500 // len(message.content)
+        if config.stfuuuuu_aunk in { str(role.id) for role in message.author.roles } and not randrange(chance):
+            role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
             await message.channel.send(role.mention)
