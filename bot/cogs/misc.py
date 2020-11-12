@@ -1,5 +1,6 @@
 from pytz import timezone
 from random import randrange
+import math
 
 import discord
 from discord.ext import tasks, commands
@@ -32,7 +33,8 @@ class DailyReminder(_Cog, name='js'):
 class StfuuuuuAunk(_Cog):
     @_Cog.listener(name='on_message')
     async def stfuuuuu_aunk(self, message):
-        chance = 1500 // len(message.content)
-        if config.stfuuuuu_aunk in { str(role.id) for role in message.author.roles } and not randrange(chance):
+        chance = math.ceil(500**2 / len(message.content)**2)
+        fire = not (chance and randrange(chance))
+        if config.stfuuuuu_aunk in { str(role.id) for role in message.author.roles } and fire:
             role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
             await message.channel.send(role.mention)
