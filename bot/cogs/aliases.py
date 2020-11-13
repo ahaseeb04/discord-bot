@@ -13,7 +13,7 @@ class Aliases(_Cog, name='aliases'):
 
     @commands.command(brief="Get a List of aliases")
     async def aliases(self, context):
-        await context.channel.send(self.df)
+        await context.channel.send(f"```{self.df.reset_index().to_string(index=False)}```")
 
     @commands.command(brief="Add/Update alias")
     async def alias(self, context):

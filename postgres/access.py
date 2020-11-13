@@ -12,7 +12,7 @@ def _csv_to_sql(engine):
     df.to_sql('aliases', engine, if_exists='replace', index=False )
 
 def sql_to_df(engine):
-    return pd.read_sql('aliases', engine)
+    return pd.read_sql('aliases', engine).set_index('alias')
 
 def df_to_sql(df, engine):
     df.to_sql('aliases', engine, if_exists='replace')
@@ -20,4 +20,4 @@ def df_to_sql(df, engine):
 if __name__ == "__main__":
     eng = connect()
     df = sql_to_df(eng)
-    print(df)
+    print(df.to_string())
