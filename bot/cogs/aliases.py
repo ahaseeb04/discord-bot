@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 
 from bot.exceptions import InvalidPermissionsError, WrongchannelError
+from bot.utils import get_index
 from postgres import set_alias, set_unalias, connect, sql_to_df, df_to_sql
 from ._cog import _Cog
 
@@ -32,12 +33,12 @@ class Aliases(_Cog, name='aliases'):
 
             vals = [val.strip() for val in context.message.content.split(self.client.command_prefix)]
             alias, role = vals[2], get_index(vals, 3)
+            self.df = set_alias(self.df, alias, role)
         except IndexError:
             await context.channel.send('No alias provided')
         except InvalidPermissionsError:
             await context.channel.send("Insufficient permissions")
         else:
-            self.df = set_alias(self.df, alias, role)
             await context.channel.send(f'Role "{alias}" has been set to "{role}"')
             df_to_sql(self.df, self.engine)
 
@@ -58,10 +59,4 @@ class Aliases(_Cog, name='aliases'):
         else:
             await context.channel.send(f'Role "{alias}" has been removed')
             df_to_sql(self.df, self.engine)
-
-def get_index(lst, i, default=None):
-    try:
-        return lst[i]
-    except IndexError:
-        return default
 
