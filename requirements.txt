@@ -8,3 +8,4 @@ aiocron
 psycopg2
 pandas
 sqlalchemy
+tabulate
