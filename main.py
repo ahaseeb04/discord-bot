@@ -3,6 +3,7 @@ import inspect
 import discord
 from discord.ext import commands
 
+from postgres import postgres_access
 from bot import config
 from bot.cogs._cog import _Cog
 
