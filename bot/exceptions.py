@@ -9,3 +9,6 @@ class DataNotFoundError(Exception):
 
 class WrongchannelError(Exception):
     pass
+
+class InvalidPermissionsError(Exception):
+    pass
