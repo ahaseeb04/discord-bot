@@ -1,3 +1,5 @@
+from tabulate import tabulate
+
 import discord
 from discord.ext import commands
 
@@ -19,7 +21,8 @@ class Aliases(_Cog, name='aliases'):
         except InvalidPermissionsError:
             await context.channel.send("Insufficient permissions")
         else:
-            await context.channel.send(f"```{self.df.reset_index().to_string(index=False)}```")
+            # await context.channel.send(f"```{self.df.reset_index().to_string(index=False)}```")
+            await context.channel.send(f"```\n{tabulate(self.df.sort_values(by=['alias']), headers='keys', tablefmt='psql')}```")
 
     @commands.command(brief="Add/Update alias")
     async def alias(self, context):
