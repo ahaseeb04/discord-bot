@@ -17,6 +17,9 @@ def sql_to_df(engine):
 def df_to_sql(df, engine):
     df.to_sql('aliases', engine, if_exists='replace')
 
+def df_to_dict(df):
+    return df.to_dict()
+
 if __name__ == "__main__":
     eng = connect()
     df = sql_to_df(eng)

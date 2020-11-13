@@ -1,4 +1,3 @@
-import csv
 import asyncio
 
 from fuzzywuzzy import fuzz
@@ -7,6 +6,7 @@ from discord.ext import commands
 
 from bot import config
 from bot.exceptions import IllegalFormatError, NotApprovedError, WrongchannelError
+from postgres import df_to_dict, sql_to_df, connect
 from ._cog import _Cog
 
 class VerifyUser(_Cog, name="verify"):
@@ -42,7 +42,7 @@ class VerifyUser(_Cog, name="verify"):
                 raise WrongchannelError()
 
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
-            aliases = { key : value.strip() for key, value in csv.reader(open('bot/support/aliases.csv', 'r')) }
+            aliases = df_to_dict(sql_to_df(connect())['role'])
 
             roles = { **roles, **aliases }
 
