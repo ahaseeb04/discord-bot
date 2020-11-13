@@ -22,7 +22,7 @@ class Aliases(_Cog, name='aliases'):
             await context.channel.send("Insufficient permissions")
         else:
             # await context.channel.send(f"```{self.df.reset_index().to_string(index=False)}```")
-            await context.channel.send(f"```\n{tabulate(self.df.sort_values(by=['alias']), headers='keys', tablefmt='psql')}```")
+            await context.channel.send(f"```\n{tabulate(self.df, headers='keys', tablefmt='psql')}```")
 
     @commands.command(brief="Add/Update alias")
     async def alias(self, context):
