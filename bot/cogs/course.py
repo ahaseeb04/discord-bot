@@ -1,18 +1,18 @@
 import re
 import csv
-from datetime import datetime, timedelta
 from itertools import tee
+from datetime import datetime, timedelta
 
 import discord
 from discord.ext import commands
 
-from scrapers import scrape_course
 from bot import config
-from bot.exceptions import DataNotFoundError, IllegalFormatError
+from ._cog import _Cog
+from scrapers import scrape_course
 from bot.errors import course_error
 from bot.regex import course_regex
 from bot.embed_builder import EmbedBuilder
-from ._cog import _Cog
+from bot.exceptions import DataNotFoundError, IllegalFormatError
 
 class Course(_Cog, name="course"):
     @commands.command(brief='Fetch information regarding a course from YorkU.')
