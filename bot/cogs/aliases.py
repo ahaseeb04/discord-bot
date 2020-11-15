@@ -3,6 +3,7 @@ from tabulate import tabulate
 import discord
 from discord.ext import commands
 
+from bot import config
 from bot.exceptions import InvalidPermissionsError, WrongChannelError, IllegalFormatError, DataNotFoundError
 from postgres import set_alias, set_unalias, connect, sql_to_df, df_to_sql
 from ._cog import _Cog
@@ -11,7 +12,7 @@ class Aliases(_Cog, name='aliases'):
     def __init__(self, client):
         _Cog.__init__(self, client)
         self.engine = connect()
-        self.df = sql_to_df(self.engine)
+        self.df = sql_to_df(self.engine, 'aliases', 'alias')
 
     @commands.command(brief="Get a List of aliases")
     async def aliases(self, context):
@@ -41,7 +42,7 @@ class Aliases(_Cog, name='aliases'):
             await context.channel.send('No alias provided')
         else:
             await context.channel.send(f'Role "{alias}" has been set to "{role}"')
-            df_to_sql(self.df, self.engine)
+            df_to_sql(self.df, self.engine, 'aliases')
 
     @commands.command(brief="Remove alias")
     async def unalias(self, context):
@@ -66,4 +67,4 @@ class Aliases(_Cog, name='aliases'):
             await context.channel.send(f'Alias "{alias}" does not exist')
         else:
             await context.channel.send(f'Role "{alias}" has been removed')
-            df_to_sql(self.df, self.engine)
+            df_to_sql(self.df, self.engine, 'aliases')

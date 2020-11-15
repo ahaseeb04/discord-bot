@@ -42,7 +42,7 @@ class VerifyUser(_Cog, name="verify"):
                 raise WrongChannelError()
 
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
-            aliases = df_to_dict(sql_to_df(connect())['role'])
+            aliases = df_to_dict(sql_to_df(connect(), 'aliases', 'alias')['role'])
 
             roles = { **roles, **aliases }
 

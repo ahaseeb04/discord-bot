@@ -8,5 +8,5 @@ import postgres
 
 eng = postgres.connect()
 postgres._csv_to_sql(eng)
-df = postgres.sql_to_df(eng)
+df = postgres.sql_to_df(eng, 'aliases')
 print(df)
