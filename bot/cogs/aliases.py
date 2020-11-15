@@ -3,7 +3,7 @@ from tabulate import tabulate
 import discord
 from discord.ext import commands
 
-from bot.exceptions import InvalidPermissionsError, WrongchannelError
+from bot.exceptions import InvalidPermissionsError, WrongChannelError, IllegalFormatError, DataNotFoundError
 from bot.utils import get_index
 from postgres import set_alias, set_unalias, connect, sql_to_df, df_to_sql
 from ._cog import _Cog
@@ -22,7 +22,6 @@ class Aliases(_Cog, name='aliases'):
         except InvalidPermissionsError:
             await context.channel.send("Insufficient permissions")
         else:
-            # await context.channel.send(f"```{self.df.reset_index().to_string(index=False)}```")
             await context.channel.send(f"```\n{tabulate(self.df, headers='keys', tablefmt='psql')}```")
 
     @commands.command(brief="Add/Update alias")
@@ -31,13 +30,16 @@ class Aliases(_Cog, name='aliases'):
             if not context.message.author.guild_permissions.manage_roles:
                 raise InvalidPermissionsError()
 
-            vals = [val.strip() for val in context.message.content.split(self.client.command_prefix)]
-            alias, role = vals[2], get_index(vals, 3)
+            data = {i : val.strip() for i, val in enumerate(context.message.content.split(self.client.command_prefix)[2:4])}
+            if not len(data):
+                raise IllegalFormatError()
+            alias, role = data.get(0).lower(), data.get(1)
+
             self.df = set_alias(self.df, alias, role)
-        except IndexError:
-            await context.channel.send('No alias provided')
         except InvalidPermissionsError:
             await context.channel.send("Insufficient permissions")
+        except IllegalFormatError:
+            await context.channel.send('No alias provided')
         else:
             await context.channel.send(f'Role "{alias}" has been set to "{role}"')
             df_to_sql(self.df, self.engine)
@@ -48,15 +50,21 @@ class Aliases(_Cog, name='aliases'):
             if not context.message.author.guild_permissions.manage_roles:
                 raise InvalidPermissionsError()
 
-            alias = [val.strip() for val in context.message.content.split(self.client.command_prefix)][2]
+            data = context.message.content.split(self.client.command_prefix)[2:3]
+            if not len(data):
+                raise IllegalFormatError()
+            alias = data[0].strip().lower()
+
+            if alias not in self.df.index:
+                raise DataNotFoundError()
+
             self.df = set_unalias(self.df, alias)
-        except IndexError:
-            await context.channel.send('No alias provided')
-        except KeyError:
-            await context.channel.send(f'Alias "{alias}" does not exist')
         except InvalidPermissionsError:
             await context.channel.send("Insufficient permissions")
+        except IllegalFormatError:
+            await context.channel.send('No alias provided')
+        except DataNotFoundError:
+            await context.channel.send(f'Alias "{alias}" does not exist')
         else:
             await context.channel.send(f'Role "{alias}" has been removed')
             df_to_sql(self.df, self.engine)
-
