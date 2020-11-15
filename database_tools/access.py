@@ -11,12 +11,12 @@ def engine():
     return create_engine(link)
 
 def _csv_to_sql(table, engine):
-    df = pd.read_csv(f'database/support/{table}.csv')
+    df = pd.read_csv(f'database_tools/support/{table}.csv')
     df.to_sql(table, engine, if_exists='replace')
 
 def _sql_to_csv(table, engine):
     df = pd.read_sql(table, engine)
-    df.to_csv(f'database/support/{table}.csv', index=False)
+    df.to_csv(f'database_tools/support/{table}.csv', index=False)
 
 def sql_to_df(table, engine, index):
     try:
