@@ -11,7 +11,7 @@ from bot.errors import course_list_error
 from bot.embed_builder import EmbedBuilder
 from bot.exceptions import DataNotFoundError, IllegalFormatError
 
-class CourseList(_Cog, name='courselist'):
+class CourseList(_Cog, name='course'):
     @commands.command(brief='Fetch all the courses for a specified program.')
     async def courselist(self, context):
         course_list = ' '.join(context.message.content.split()[1:])
