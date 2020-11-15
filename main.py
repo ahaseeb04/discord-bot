@@ -11,6 +11,7 @@ if __name__ == "__main__":
     client = commands.Bot(command_prefix=';', intents=intents)
 
     for cog in _Cog.__subclasses__():
+        print(cog)
         client.add_cog(cog(client))
 
     client.run(config.token)

@@ -7,5 +7,8 @@ class NotApprovedError(Exception):
 class DataNotFoundError(Exception):
     pass
 
+class InvalidPermissionsError(Exception):
+    pass
+
 class WrongChannelError(Exception):
     pass

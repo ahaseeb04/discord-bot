@@ -5,3 +5,7 @@ python-Levenshtein
 requests
 beautifulsoup4
 aiocron
+psycopg2
+pandas
+sqlalchemy
+tabulate
