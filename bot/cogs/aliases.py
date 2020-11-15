@@ -4,7 +4,6 @@ import discord
 from discord.ext import commands
 
 from bot.exceptions import InvalidPermissionsError, WrongChannelError, IllegalFormatError, DataNotFoundError
-from bot.utils import get_index
 from postgres import set_alias, set_unalias, connect, sql_to_df, df_to_sql
 from ._cog import _Cog
 
