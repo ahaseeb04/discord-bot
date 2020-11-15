@@ -10,8 +10,8 @@ def engine():
     link = config.database_url or URL(**config.database)
     return create_engine(link)
 
-def _csv_to_sql(table, engine):
-    df = pd.read_csv(f'database_tools/support/{table}.csv')
+def _csv_to_sql(table, engine, index):
+    df = pd.read_csv(f'database_tools/support/{table}.csv').set_index(index)
     df.to_sql(table, engine, if_exists='replace')
 
 def _sql_to_csv(table, engine):
@@ -22,7 +22,7 @@ def sql_to_df(table, engine, index):
     try:
         return pd.read_sql(table, engine).set_index(index)
     except ProgrammingError:
-        _csv_to_sql(table, engine)
+        _csv_to_sql(table, engine, index)
         return sql_to_df(table, engine, index)
 
 def df_to_sql(df, table, engine):
