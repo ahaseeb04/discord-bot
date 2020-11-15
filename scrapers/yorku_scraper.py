@@ -8,7 +8,7 @@ def scrape_course_list(course):
     def _build_link(department, course=None, faculty=None, session=None, year=None):
         faculty = faculty or dict(csv.reader(open('scrapers/support/faculties.csv', 'r'))).get(department)
         yield f'faculty={faculty}'
-        yield f'subject={department}'
+        yield f'subject={department.ljust(4)}'
         if session is not None and year is not None:
             yield f'academicyear={year}'
             yield f'studysession={session}'
