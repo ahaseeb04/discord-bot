@@ -7,6 +7,6 @@ import database_tools
 # Warning, the previous DB is not recoverable if you try this
 
 eng = database_tools.engine()
-database_tools._csv_to_sql(eng)
-df = database_tools.sql_to_df(eng, 'aliases')
+database_tools._csv_to_sql('aliases', eng, 'alias')
+df = database_tools.sql_to_df('aliases', eng, 'alias')
 print(df)
