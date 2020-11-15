@@ -11,11 +11,12 @@ bot_id = os.getenv('BOT_ID')
 cs_channel = os.getenv('CS_CHANNEL')
 engineering_channel = os.getenv('ENGINEERING_CHANNEL')
 stfuuuuu_aunk = os.getenv('STFUUUUU_AUNK')
-postgres_url = os.getenv('DATABASE_URL', None)
-postgres = {
-    'user': os.getenv('POSTGRES_USER'),
-    'password': os.getenv('POSTGRES_PASSWORD'),
-    'host': os.getenv('HOST', default='0.0.0.0'),
-    'database': os.getenv('POSTGRES_DB'),
-    'port': os.getenv('PORT', default='5432')
+database_url = os.getenv('DATABASE_URL', None)
+database = {
+    'drivername': os.getenv('DB_DRIVER'),
+    'username': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'host': os.getenv('DB_HOST', default='0.0.0.0'),
+    'database': os.getenv('DB_NAME'),
+    'port': os.getenv('DB_PORT', default='5432')
 }

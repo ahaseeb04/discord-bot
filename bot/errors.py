@@ -1,5 +1,5 @@
 course_list_error = "The requested course list was not found. \n\
-    \nCourse lits should be of the form: \
+    \nCourse list should be of the form: \
     \n\u2003\u2002[faculty] dept [session year] \n\
     \nExamples: \
     \n\u2003\u2022 EECS \

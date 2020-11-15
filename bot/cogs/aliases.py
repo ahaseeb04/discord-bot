@@ -5,13 +5,13 @@ from discord.ext import commands
 
 from bot import config
 from bot.exceptions import InvalidPermissionsError, WrongChannelError, IllegalFormatError, DataNotFoundError
-from postgres import set_alias, set_unalias, db_connect, sql_to_df, df_to_sql
+from database_tools import set_alias, set_unalias, engine, sql_to_df, df_to_sql
 from ._cog import _Cog
 
 class Aliases(_Cog, name='aliases'):
     def __init__(self, client):
         _Cog.__init__(self, client)
-        self.engine = db_connect()
+        self.engine = engine()
         self.df = sql_to_df('aliases', self.engine, 'alias')
 
     @commands.command(brief="Get a List of aliases")

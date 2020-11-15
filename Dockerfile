@@ -9,6 +9,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY main.py .
 COPY bot bot/.
 COPY scrapers scrapers/.
-COPY postgres postgres/.
+COPY database_tools database_tools/.
 
 CMD python -u main.py
