@@ -7,7 +7,7 @@ from discord.ext import commands
 from bot import config
 from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError
 from ._cog import _Cog
-from postgres import df_to_dict, sql_to_df, db_connect
+from database_tools import df_to_dict, sql_to_df, engine
 
 class VerifyUser(_Cog, name="verify"):
     @commands.command(brief='Request roles for yourself.')
@@ -42,7 +42,7 @@ class VerifyUser(_Cog, name="verify"):
                 raise WrongChannelError()
 
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
-            aliases = df_to_dict(sql_to_df('aliases', db_connect(), 'alias')['role'])
+            aliases = df_to_dict(sql_to_df('aliases', engine(), 'alias')['role'])
 
             roles = { **roles, **aliases }
 

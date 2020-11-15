@@ -1,21 +1,22 @@
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.engine.url import URL
 import psycopg2 
 
 from bot import config
 
-def db_connect():
-    link = config.postgres_url or 'postgresql://{user}:{password}@{host}:{port}/{database}'.format(**config.postgres)
+def engine():
+    link = config.database_url or URL(**config.database)
     return create_engine(link)
 
 def _csv_to_sql(table, engine):
-    df = pd.read_csv(f'postgres/support/{table}.csv')
+    df = pd.read_csv(f'database/support/{table}.csv')
     df.to_sql(table, engine, if_exists='replace')
 
 def _sql_to_csv(table, engine):
     df = pd.read_sql(table, engine)
-    df.to_csv(f'postgres/support/{table}.csv', index=False)
+    df.to_csv(f'database/support/{table}.csv', index=False)
 
 def sql_to_df(table, engine, index):
     try:

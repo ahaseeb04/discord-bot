@@ -41,7 +41,7 @@ class Hey(_Cog, name='hey'):
 class StfuuuuuAunk(_Cog):
     @_Cog.listener(name='on_message')
     async def stfuuuuu_aunk(self, message):
-        chance = math.ceil(500**2 / len(message.content)**2)
+        chance = math.ceil(500**2 / (len(message.content)**2) or 1)
         fire = not (chance and randrange(chance))
         if config.stfuuuuu_aunk in { str(role.id) for role in message.author.roles } and fire:
             role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
