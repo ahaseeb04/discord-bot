@@ -1,6 +1,5 @@
 import re
 import csv
-from itertools import tee
 from datetime import datetime, timedelta
 
 import discord
@@ -50,6 +49,9 @@ class Course(_Cog, name="course"):
                     def _format_time(time):
                         return datetime.strptime(str(time), "%H:%M:%S").strftime('%-I:%M %p')
 
+                    if duration == '0':
+                        return 'No Scheduled Time'
+
                     hours, minutes = map(int, time.split(':'))
                     start = timedelta(hours=hours, minutes=minutes)
                     end = start + timedelta(minutes=int(duration))
@@ -81,13 +83,14 @@ class Course(_Cog, name="course"):
             if info is None:
                 raise IllegalFormatError()
 
-            courses, test = tee(scrape_course(info.groupdict()))
-            if next(test, None) is None:
+            courses = scrape_course(info.groupdict())
+            embeds = [embed for course_info in courses for embed in _format_course(course_info)]
+
+            if not len(embeds):
                 raise DataNotFoundError()
 
         except (DataNotFoundError, IllegalFormatError):
             embed = discord.Embed(title="Error", description=course_error, color=0xff0000, inline=False)
             await context.channel.send(embed=embed)
         else:
-            embeds = [embed for course_info in courses for embed in _format_course(course_info)]
             await BotEmbedPaginator(context, embeds).run()
