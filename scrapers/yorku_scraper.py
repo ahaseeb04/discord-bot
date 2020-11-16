@@ -5,30 +5,40 @@ import bs4
 import requests
 
 def scrape_course_list(course):
-    def _build_link(department, course=None, faculty=None, session=None, year=None):
-        faculty = faculty or dict(csv.reader(open('scrapers/support/faculties.csv', 'r'))).get(department)
-        yield f'faculty={faculty}'
-        yield f'subject={department.ljust(4)}'
-        if session is not None and year is not None:
-            yield f'academicyear={year}'
-            yield f'studysession={session}'
+    def csv_to_dict(path):
+        return {row[0]: row[1:] for row in csv.reader(open(path, 'r'))}
 
-    prefix = "https://w2prod.sis.yorku.ca/Apps/WebObjects/cdm.woa/wa/crsq1?"
-    suffix = '&'.join(_build_link(**course))
-    URL = ''.join([prefix, suffix])
+    def _scrape_faculty(faculty):
+        def _build_link(faculty, department, course=None, session=None, year=None):
+            yield f'faculty={faculty}'
+            yield f'subject={department.ljust(4)}'
+            if session is not None and year is not None:
+                yield f'academicyear={year}'
+                yield f'studysession={session}'
 
-    page = requests.get(URL)
+        prefix = "https://w2prod.sis.yorku.ca/Apps/WebObjects/cdm.woa/wa/crsq1?"
+        suffix = '&'.join(_build_link(faculty, **course))
+        URL = ''.join((prefix, suffix))
 
-    soup = bs4.BeautifulSoup(page.content, 'html.parser')
-    try:
-        rows = soup.find_all('table')[6].find_all('tr', recursive=False)
-    except:
-        return None
+        page = requests.get(URL)
 
-    for row in rows[1:]:
-        code, title, link = row.find_all('td', recursive=False)[:3]
-        yield (code.text, title.text, ''.join(("https://w2prod.sis.yorku.ca/", link.find('a')['href'])))
+        soup = bs4.BeautifulSoup(page.content, 'html.parser')
+        try:
+            rows = soup.find_all('table')[6].find_all('tr', recursive=False)
+        except:
+            return None
 
+        for row in rows[1:]:
+            code, title, link = row.find_all('td', recursive=False)[:3]
+            yield (code.text, title.text, ''.join(("https://w2prod.sis.yorku.ca/", link.find('a')['href'])))
+
+    faculty = course.pop('faculty', None)
+    if faculty is None:
+        for faculty in csv_to_dict('scrapers/support/faculties.csv').get(course.get('department'), []):
+            yield from _scrape_faculty(faculty)
+    else:
+        yield from _scrape_faculty(faculty)
+    
 def scrape_course(course):
     def scrape_heading(soup):
         return soup.find(class_="heading").text
@@ -60,7 +70,7 @@ def scrape_course(course):
         return section
         
     for URL in scrape_course_list(course):
-        if URL[0].split()[1] == course['course']:
+        if URL[0].split()[1].startswith(course['course']):
             page = requests.get(URL[2])
             soup = bs4.BeautifulSoup(page.content, 'html.parser')
 
@@ -81,4 +91,3 @@ if __name__ == "__main__":
         "(?P<course>[0-9]{4}))+"
         "(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?"
     )), course.lower())
-    print(*scrape_course(info.groupdict()))
