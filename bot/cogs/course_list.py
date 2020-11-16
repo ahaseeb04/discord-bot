@@ -3,6 +3,7 @@ from itertools import tee
 
 import discord
 from discord.ext import commands
+from disputils import BotEmbedPaginator
 
 from ._cog import _Cog
 from scrapers import scrape_course_list
@@ -34,5 +35,4 @@ class CourseList(_Cog, name='course'):
             for course in course_list:
                 embeds.add_field(name=course[0], value=f'[{course[1]}]({course[2]})')
 
-            for embed in embeds:
-                await context.channel.send(embed=embed)
+            await BotEmbedPaginator(context, list(embeds)).run()

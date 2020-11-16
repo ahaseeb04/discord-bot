@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 import discord
 from discord.ext import commands
+from disputils import BotEmbedPaginator
 
 from bot import config
 from ._cog import _Cog
@@ -88,6 +89,5 @@ class Course(_Cog, name="course"):
             embed = discord.Embed(title="Error", description=course_error, color=0xff0000, inline=False)
             await context.channel.send(embed=embed)
         else:
-            for course_info in courses:
-                for embed in _format_course(course_info):
-                    await context.channel.send(embed=embed)
+            embeds = [embed for course_info in courses for embed in _format_course(course_info)]
+            await BotEmbedPaginator(context, embeds).run()

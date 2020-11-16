@@ -12,11 +12,12 @@ cs_channel = os.getenv('CS_CHANNEL')
 engineering_channel = os.getenv('ENGINEERING_CHANNEL')
 stfuuuuu_aunk = os.getenv('STFUUUUU_AUNK')
 database_url = os.getenv('DATABASE_URL', None)
+db = os.getenv('DB')
 database = {
-    'drivername': os.getenv('DB_DRIVER'),
-    'username': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASSWORD'),
-    'host': os.getenv('DB_HOST', default='0.0.0.0'),
-    'database': os.getenv('DB_NAME'),
-    'port': os.getenv('DB_PORT', default='5432')
+    'drivername': os.getenv(f'{db}_DRIVER'),
+    'username': os.getenv(f'{db}_USER'),
+    'password': os.getenv(f'{db}_PASSWORD'),
+    'host': os.getenv(f'{db}_HOST', default='0.0.0.0'),
+    'database': os.getenv(f'{db}_NAME'),
+    'port': os.getenv(f'{db}_PORT', default='5432')
 }
