@@ -23,7 +23,8 @@ class Course(_Cog, name="course"):
                 description=course_info['description'],
                 color=0x0000ff,
                 url=course_info['url'],
-                thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg'
+                thumbnail='http://continue.yorku.ca/york-scs/wp-content/uploads/2016/06/YorkU-logo6.jpg',
+                store=False
             )
             for section in course_info['sections']:
                 tmp = EmbedBuilder()
@@ -31,7 +32,7 @@ class Course(_Cog, name="course"):
                 for name, value in _format_section(section):
                     tmp.add_field(name=name, value=value, inline=False)
                 if len(tmp.get_fields()) > 1:
-                    embeds.merge_fields(tmp)
+                    embeds.insert_embed(tmp)
             if len(embeds.get_fields()) > 0:
                 return embeds
             return []

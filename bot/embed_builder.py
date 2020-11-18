@@ -9,7 +9,10 @@ class EmbedBuilder():
         }
         self.max_fields = kwargs.get('max_fields', 25)
         self.thumbnail = kwargs.pop('thumbnail', discord.Embed.Empty)
-        self.embeds = [discord.Embed(**kwargs).set_thumbnail(url=self.thumbnail)]
+        self.embeds = []
+        if kwargs.get('store', True):
+            self.embeds.append(discord.Embed(**kwargs).set_thumbnail(url=self.thumbnail))
+        self.description = kwargs.get('description')
 
     def add_field(self, **kwargs):
         embed = self.embeds[-1]
@@ -17,6 +20,11 @@ class EmbedBuilder():
             embed = discord.Embed(**self.properties).set_thumbnail(url=self.thumbnail)
             self.embeds.append(embed)
         embed.add_field(**kwargs)
+        
+    def insert_embed(self, embed):
+        new_embed = discord.Embed(description=self.description, **self.properties).set_thumbnail(url=self.thumbnail)
+        self.embeds.append(new_embed)
+        self.merge_fields(embed)
 
     def merge_fields(self, embed):
         for field in embed.get_fields():
