@@ -35,21 +35,21 @@ class Unverify(_Cog):
         print(df)
 
     @commands.has_permissions(manage_roles=True)
-    @commands.command()
+    @commands.command(hidden=True)
     async def get_df(self, context):
         self.df = sql_to_df('last message', self.engine, 'user id')
         await context.channel.send(f"```\n{tabulate(self.df, headers='keys', tablefmt='psql')}```")
     
     @commands.has_permissions(manage_roles=True)
-    @commands.command()
+    @commands.command(hidden=True)
     async def get_redis(self, context):
         data = self.redis.hgetall("users")
         df = pd.DataFrame.from_dict(data, orient='index', columns=['date']).rename_axis('user id')
         await context.channel.send(f"```\n{tabulate(df, headers='keys', tablefmt='psql')}```")
 
-    @commands.has_permissions(manage_roles=True)
-    @commands.command()
-    async def clear_redis(self, context):
-        self.redis.delete('users')
+    # @commands.has_permissions(manage_roles=True)
+    # @commands.command(hidden=True)
+    # async def clear_redis(self, context):
+    #     self.redis.delete('users')
 
     
