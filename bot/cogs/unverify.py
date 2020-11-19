@@ -19,14 +19,19 @@ class Unverify(_Cog):
         self.redis = redis.StrictRedis.from_url(config.redis_url, decode_responses=True)
         self.engine = engine(db_url=config.postgres_url, db_params=config.postgres_params)
         self.df = sql_to_df('last message', self.engine, 'user id')
-        aiocron.crontab('0 4 * * *', func=self.push_df, tz=tz)
+        aiocron.crontab('0 4 * * *', func=self.push, tz=tz)
 
-    @_Cog.listener(name='on_message')
-    async def unverify(self, message):
+    @_Cog.listener()
+    async def on_message(self, message):
         if any(str(role.id) == config.verified_role for role in message.author.roles):
             self.redis.hmset("users" , {message.author.id : date.today().isoformat()})
 
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(hidden=True)
     async def push_df(self, context):
+        await self.push()
+
+    async def push(self):
         data = self.redis.hgetall("users")
         df = pd.DataFrame.from_dict(data, orient='index', columns=['last message']).rename_axis('user id')
         df = pd.concat([self.df, df]).groupby(level=0).last()

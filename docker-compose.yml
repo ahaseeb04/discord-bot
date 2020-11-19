@@ -6,7 +6,6 @@ services:
             - ${PWD}:/usr/src/app
         links:
             - postgres
-            - redis
     postgres:
         image: postgres
         env_file:
@@ -14,5 +13,3 @@ services:
         ports:
             - "5432:5432"
         restart: always
-    redis:
-        image: redis:alpine
