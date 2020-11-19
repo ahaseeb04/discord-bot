@@ -24,8 +24,7 @@ class Unverify(_Cog):
     @_Cog.listener()
     async def on_message(self, message):
         author = message.guild.get_member(message.author.id)
-        print(author)
-        if any(str(role.id) == config.verified_role for role in message.author.roles):
+        if any(str(role.id) == config.verified_role for role in author.roles):
             self.redis.hmset("users" , {message.author.id : date.today().isoformat()})
 
     @commands.has_permissions(manage_roles=True)
@@ -62,7 +61,6 @@ class Unverify(_Cog):
         data = {}
         for user in self.client.get_all_members():
             if any(str(role.id) == config.verified_role for role in user.roles):
-                print(user)
                 data[str(user.id)] = [date.today().isoformat(), float('nan')]
         print(data)
         df = pd.DataFrame.from_dict(data, orient='index', columns=['verified', 'last message']).rename_axis('user id')
