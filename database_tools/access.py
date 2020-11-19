@@ -29,3 +29,6 @@ def df_to_sql(df, table, engine):
 
 def df_to_dict(df):
     return df.to_dict()
+
+def dict_to_df(data, index):
+    return pd.DataFrame.from_dict(data).rename_axis(index)
