@@ -5,7 +5,7 @@ from tabulate import tabulate
 from discord.ext import commands
 import aiocron
 
-from database_tools import engine, sql_to_df, df_to_sql
+from database_tools import engine, sql_to_df, df_to_sql, redis_access
 from bot import config
 from ._cog import _Cog
 
@@ -16,8 +16,8 @@ class Unverify(_Cog):
     def __init__(self, client):
         _Cog.__init__(self, client)
         tz = timezone('US/Eastern')
-        self.redis = redis.StrictRedis.from_url(config.redis_url, decode_responses=True)
-        self.engine = engine(db_url=config.postgres_url, db_params=config.postgres_params)
+        self.redis = redis_access(url=config.redis_url, params=config.redis_params)
+        self.engine = engine(url=config.postgres_url, params=config.postgres_params)
         self.df = sql_to_df('last message', self.engine, 'user id')
         aiocron.crontab('0 4 * * *', func=self.push, tz=tz)
 

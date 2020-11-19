@@ -10,7 +10,7 @@ from ._cog import _Cog
 class Aliases(_Cog, name='aliases'):
     def __init__(self, client):
         _Cog.__init__(self, client)
-        self.engine = engine(db_url=config.postgres_url, db_params=config.postgres_params)
+        self.engine = engine(url=config.postgres_url, params=config.postgres_params)
         self.df = sql_to_df('aliases', self.engine, 'alias')
 
     @commands.has_permissions(manage_roles=True)

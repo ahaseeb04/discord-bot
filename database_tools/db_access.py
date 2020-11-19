@@ -4,10 +4,8 @@ from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.engine.url import URL
 import psycopg2 
 
-from bot import config
-
-def engine(db_url=None, db_params=None):
-    return create_engine(db_url or URL(**db_params))
+def engine(url=None, params=None):
+    return create_engine(url or URL(**params))
 
 def _csv_to_sql(table, engine, index):
     df = pd.read_csv(f'database_tools/support/{table}.csv').set_index(index)

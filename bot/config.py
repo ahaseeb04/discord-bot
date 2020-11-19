@@ -17,9 +17,12 @@ postgres_params = {
     'drivername': os.getenv('POSTGRES_DRIVER'),
     'username': os.getenv('POSTGRES_USER'),
     'password': os.getenv('POSTGRES_PASSWORD'),
-    'host': os.getenv('POSTGRES_HOST', default='0.0.0.0'),
+    'host': os.getenv('HOST', default='0.0.0.0'),
     'database': os.getenv('POSTGRES_NAME'),
     'port': os.getenv('POSTGRES_PORT', default='5432')
 }
-redis_tls_url = os.getenv('REDIS_TLS_URL')
 redis_url = os.getenv('REDIS_URL')
+redis_params = {
+    'host': os.getenv('HOST', default='0.0.0.0'),
+    'port': os.getenv('REDIS_PORT', default="6379")
+}
