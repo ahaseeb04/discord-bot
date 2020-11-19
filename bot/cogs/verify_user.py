@@ -1,4 +1,5 @@
 import asyncio
+from datetime import date, datetime
 
 from fuzzywuzzy import fuzz
 from discord.utils import get
@@ -7,7 +8,7 @@ from discord.ext import commands
 from bot import config
 from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError
 from ._cog import _Cog
-from database_tools import df_to_dict, sql_to_df, engine
+from database_tools import df_to_dict, sql_to_df, dict_to_df, df_to_sql, engine
 
 class VerifyUser(_Cog, name="verify"):
     @commands.command(brief='Request roles for yourself.')
@@ -41,8 +42,9 @@ class VerifyUser(_Cog, name="verify"):
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
 
+            eng = engine(url=config.postgres_url, params=config.postgres_params)
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
-            aliases = df_to_dict(sql_to_df('aliases', engine(), 'alias')['role'])
+            aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
 
             roles = { **roles, **aliases }
 
@@ -65,8 +67,12 @@ class VerifyUser(_Cog, name="verify"):
         except asyncio.TimeoutError as e:
             print(e)
         else:
+            user = context.message.author
             for requested in requested_roles:
                 if requested is not None and len(role := roles.get(requested[1])):
-                    await context.message.author.add_roles(get(context.message.author.guild.roles, name=role))
+                    await user.add_roles(get(user.guild.roles, name=role))
 
                     print(f'{role} role assigned.')
+            df = sql_to_df('last message', eng, 'user id')
+            df.at[str(user.id), 'verified'] = date.today().isoformat()
+            df_to_sql(df, 'last message', eng)

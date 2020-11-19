@@ -1,17 +1,16 @@
 from tabulate import tabulate
-
 import discord
 from discord.ext import commands
 
 from bot import config
 from bot.exceptions import WrongChannelError, IllegalFormatError, DataNotFoundError
-from database_tools import set_alias, set_unalias, engine, sql_to_df, df_to_sql
+from database_tools import engine, sql_to_df, df_to_sql
 from ._cog import _Cog
 
 class Aliases(_Cog, name='aliases'):
     def __init__(self, client):
         _Cog.__init__(self, client)
-        self.engine = engine()
+        self.engine = engine(url=config.postgres_url, params=config.postgres_params)
         self.df = sql_to_df('aliases', self.engine, 'alias')
 
     @commands.has_permissions(manage_roles=True)
@@ -28,7 +27,8 @@ class Aliases(_Cog, name='aliases'):
                 raise IllegalFormatError()
             alias, role = data.get(0).lower(), data.get(1)
 
-            self.df = set_alias(self.df, alias, role)
+            self.df.at[alias, 'role'] = role
+            self.df = self.df.sort_values(by=['alias'])
         except IllegalFormatError:
             await context.channel.send('No alias provided')
         else:
@@ -47,7 +47,7 @@ class Aliases(_Cog, name='aliases'):
             if alias not in self.df.index:
                 raise DataNotFoundError()
 
-            self.df = set_unalias(self.df, alias)
+            self.df = self.df.drop(alias)
         except IllegalFormatError:
             await context.channel.send('No alias provided')
         except DataNotFoundError:

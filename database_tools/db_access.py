@@ -4,11 +4,8 @@ from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.engine.url import URL
 import psycopg2 
 
-from bot import config
-
-def engine():
-    link = config.database_url or URL(**config.database)
-    return create_engine(link)
+def engine(url=None, params=None):
+    return create_engine(url or URL(**params))
 
 def _csv_to_sql(table, engine, index):
     df = pd.read_csv(f'database_tools/support/{table}.csv').set_index(index)
@@ -30,3 +27,6 @@ def df_to_sql(df, table, engine):
 
 def df_to_dict(df):
     return df.to_dict()
+
+def dict_to_df(data, index):
+    return pd.DataFrame.from_dict(data).rename_axis(index)

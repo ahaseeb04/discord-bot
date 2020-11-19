@@ -5,11 +5,16 @@ services:
         volumes:
             - ${PWD}:/usr/src/app
         links:
-            - db
-    db:
+            - postgres
+            - redis
+    postgres:
         image: postgres
         env_file:
             - .env
         ports:
             - "5432:5432"
         restart: always
+    redis:
+        image: redis:alpine
+        ports:
+            - "6379:6379"
