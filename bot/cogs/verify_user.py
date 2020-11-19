@@ -41,8 +41,9 @@ class VerifyUser(_Cog, name="verify"):
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
 
+            eng = engine(db_url=config.postgres_url, db_params=config.postgres_params)
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
-            aliases = df_to_dict(sql_to_df('aliases', engine(), 'alias')['role'])
+            aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
 
             roles = { **roles, **aliases }
 

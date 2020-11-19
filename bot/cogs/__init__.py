@@ -4,3 +4,4 @@ from .course_list import CourseList
 from .rmp import RMP
 from .misc import CronJobs, StfuuuuuAunk, Main
 from .aliases import Aliases
+from .unverify import Unverify

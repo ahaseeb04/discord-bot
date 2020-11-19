@@ -11,13 +11,15 @@ bot_id = os.getenv('BOT_ID')
 cs_channel = os.getenv('CS_CHANNEL')
 engineering_channel = os.getenv('ENGINEERING_CHANNEL')
 stfuuuuu_aunk = os.getenv('STFUUUUU_AUNK')
-database_url = os.getenv('DATABASE_URL', None)
-db = os.getenv('DB')
-database = {
-    'drivername': os.getenv(f'{db}_DRIVER'),
-    'username': os.getenv(f'{db}_USER'),
-    'password': os.getenv(f'{db}_PASSWORD'),
-    'host': os.getenv(f'{db}_HOST', default='0.0.0.0'),
-    'database': os.getenv(f'{db}_NAME'),
-    'port': os.getenv(f'{db}_PORT', default='5432')
+verified_role = os.getenv('VERIFIED_ROLE')
+postgres_url = os.getenv('DATABASE_URL')
+postgres_params = {
+    'drivername': os.getenv('POSTGRES_DRIVER'),
+    'username': os.getenv('POSTGRES_USER'),
+    'password': os.getenv('POSTGRES_PASSWORD'),
+    'host': os.getenv('POSTGRES_HOST', default='0.0.0.0'),
+    'database': os.getenv('POSTGRES_NAME'),
+    'port': os.getenv('POSTGRES_PORT', default='5432')
 }
+redis_tls_url = os.getenv('REDIS_TLS_URL')
+redis_url = os.getenv('REDIS_URL')
