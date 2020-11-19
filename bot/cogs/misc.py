@@ -43,6 +43,6 @@ class StfuuuuuAunk(_Cog):
             return not (chance and randrange(chance))
 
         author = message.guild.get_member(message.author.id)
-        if any(str(role.id) == config.stfuuuuu_aunk for role in author.roles) and fire(message.content):
+        if author is not None and any(str(role.id) == config.stfuuuuu_aunk for role in author.roles) and fire(message.content):
             role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
             await message.channel.send(role.mention)

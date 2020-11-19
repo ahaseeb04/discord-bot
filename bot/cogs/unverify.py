@@ -24,7 +24,7 @@ class Unverify(_Cog):
     @_Cog.listener()
     async def on_message(self, message):
         author = message.guild.get_member(message.author.id)
-        if any(str(role.id) == config.verified_role for role in author.roles):
+        if author is not None and any(str(role.id) == config.verified_role for role in author.roles):
             self.redis.hmset("users" , {message.author.id : date.today().isoformat()})
 
     @commands.has_permissions(manage_roles=True)
