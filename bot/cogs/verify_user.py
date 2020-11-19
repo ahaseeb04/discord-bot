@@ -73,8 +73,6 @@ class VerifyUser(_Cog, name="verify"):
                     await user.add_roles(get(user.guild.roles, name=role))
 
                     print(f'{role} role assigned.')
-            md = df_to_dict(sql_to_df('last message', eng, 'user id')) 
-            md['verified'][str(user.id)] = date.today().isoformat()
-            df = dict_to_df(md, 'user id')
+            df = sql_to_df('last message', eng, 'user id')
+            df.at[str(user.id), 'verified'] = date.today().isoformat()
             df_to_sql(df, 'last message', eng)
-
