@@ -26,9 +26,9 @@ class Unverify(_Cog):
         if any(str(role.id) == config.verified_role for role in message.author.roles):
             self.redis.hmset("users" , {message.author.id : date.today().isoformat()})
 
-    async def push_df(self):
+    async def push_df(self, context):
         data = self.redis.hgetall("users")
-        df = pd.DataFrame.from_dict(data, orient='index', columns=['date']).rename_axis('user id')
+        df = pd.DataFrame.from_dict(data, orient='index', columns=['last message']).rename_axis('user id')
         df = pd.concat([self.df, df]).groupby(level=0).last()
         df_to_sql(df, 'last message', self.engine)
         self.redis.delete('users')
@@ -44,12 +44,18 @@ class Unverify(_Cog):
     @commands.command(hidden=True)
     async def get_redis(self, context):
         data = self.redis.hgetall("users")
-        df = pd.DataFrame.from_dict(data, orient='index', columns=['date']).rename_axis('user id')
+        df = pd.DataFrame.from_dict(data, orient='index', columns=['last message']).rename_axis('user id')
         await context.channel.send(f"```\n{tabulate(df, headers='keys', tablefmt='psql')}```")
 
-    # @commands.has_permissions(manage_roles=True)
-    # @commands.command(hidden=True)
-    # async def clear_redis(self, context):
-    #     self.redis.delete('users')
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(hidden=True)
+    async def users(self, context):
+        data = {}
+        for user in self.client.get_all_members():
+            if any(str(role.id) == config.verified_role for role in user.roles):
+                data[str(user.id)] = [date.today().isoformat(), float('nan')]
+        df = pd.DataFrame.from_dict(data, orient='index', columns=['verified', 'last message']).rename_axis('user id')
+        df.update(self.df)
+        df_to_sql(df, 'last message', self.engine)
 
     
