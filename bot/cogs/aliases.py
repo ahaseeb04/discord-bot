@@ -53,5 +53,5 @@ class Aliases(_Cog, name='aliases'):
         except DataNotFoundError:
             await context.channel.send(f'Alias "{alias}" does not exist')
         else:
-            await context.channel.send(f'Role "{alias}" has been removed')
+            await context.channel.send(f'Alias "{alias}" has been removed')
             df_to_sql(self.df, 'aliases', self.engine)
