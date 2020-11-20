@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 import discord
 from discord.ext import commands
-from disputils import BotEmbedPaginator
 
 from bot import config
 from ._cog import _Cog
@@ -12,6 +11,7 @@ from scrapers import scrape_course
 from bot.errors import course_error
 from bot.regex import course_regex
 from bot.embed_builder import EmbedBuilder
+from bot.pagination.paginator import BotEmbedPaginator
 from bot.exceptions import DataNotFoundError, IllegalFormatError
 
 class Course(_Cog, name="course"):
