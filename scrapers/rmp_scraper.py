@@ -46,8 +46,7 @@ def scrape_rmp(professor_name):
             return soup.find_all(attrs={ 'class': lambda e: search(e, 'FeedbackItem__FeedbackNumber') })[0].text
 
         def _scrape_difficulty():
-            if len(soup.find_all(attrs={ 'class': lambda e: search(e, 'FeedbackItem__FeedbackNumber') })) > 0:
-                return soup.find_all(attrs={ 'class': lambda e: search(e, 'FeedbackItem__FeedbackNumber') })[1].text
+            return soup.find_all(attrs={ 'class': lambda e: search(e, 'FeedbackItem__FeedbackNumber') })[1].text
 
         def _scrape_top_review():
             return soup.find(attrs={ 'class': lambda e: search(e, 'Comments__StyledComments') }).text
