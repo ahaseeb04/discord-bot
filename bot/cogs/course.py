@@ -15,7 +15,7 @@ from bot.embed_builder import EmbedBuilder
 from bot.exceptions import DataNotFoundError, IllegalFormatError
 
 class Course(_Cog, name="course"):
-    @commands.command(brief='Fetch information regarding a course from YorkU.')
+    @commands.command(brief='Fetch information regarding a course from YorkU.', aliases=['c'])
     async def course(self, context):
         def _format_course(course_info):
             embeds = EmbedBuilder(
