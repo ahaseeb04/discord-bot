@@ -13,7 +13,7 @@ from bot.embed_builder import EmbedBuilder
 from bot.exceptions import DataNotFoundError, IllegalFormatError
 
 class CourseList(_Cog, name='course'):
-    @commands.command(brief='Fetch all the courses for a specified program.')
+    @commands.command(brief='Fetch all the courses for a specified program.', aliases=['cl'])
     async def courselist(self, context):
         course_list = ' '.join(context.message.content.split()[1:])
         info = re.match(course_list_regex, course_list.lower())

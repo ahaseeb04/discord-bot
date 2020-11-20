@@ -50,9 +50,10 @@ class VerifyUser(_Cog, name="verify"):
 
             requested_roles = list(get_requested_roles())
 
-            await context.message.add_reaction(emoji='👍')
-            await context.message.add_reaction(emoji='👎')
-            await context.message.add_reaction(emoji='❌')
+            reactions = ['👍', '👎', '❌']
+
+            for reaction in reactions:
+                await context.message.add_reaction(emoji=reaction)
 
             await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
         except IllegalFormatError:
@@ -63,7 +64,7 @@ class VerifyUser(_Cog, name="verify"):
             await context.message.channel.send(f'{context.message.author} has been kicked from server.')
         except WrongChannelError:
             channel = self.client.get_channel(int(config.verification_channel))
-            await context.message.channel.send(f'Command "verify" can only be used in {channel.mention}')
+            await context.message.channel.send(f'Command "verify" can only be used in {channel.mention}.')
         except asyncio.TimeoutError as e:
             print(e)
         else:
@@ -73,6 +74,11 @@ class VerifyUser(_Cog, name="verify"):
                     await user.add_roles(get(user.guild.roles, name=role))
 
                     print(f'{role} role assigned.')
+
+            await context.message.channel.send(f'{user} has been verified.')
+
             df = sql_to_df('last message', eng, 'user id')
             df.at[str(user.id), 'verified'] = date.today().isoformat()
             df_to_sql(df, 'last message', eng)
+        finally:
+            await context.message.clear_reactions()
