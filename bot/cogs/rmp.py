@@ -1,25 +1,36 @@
 import discord
+from itertools import tee
 from discord.ext import commands
+from disputils import BotEmbedPaginator
 
+from ._cog import _Cog
 from scrapers import scrape_rmp
 from bot.exceptions import DataNotFoundError
-from ._cog import _Cog
 
 class RMP(_Cog, name='rmp'):
-    @commands.command(brief="Fetch a professor's information from RateMyProfessors.")
+    @commands.command(brief="Fetch a professor's information from RateMyProfessors.", aliases=['prof'])
     async def rmp(self, context):
         professor_name = context.message.content.lower().split()[1:]
+
         try:
-            data = scrape_rmp(professor_name)
+            professors, c = tee(scrape_rmp(professor_name))
+
+            if next(c, None) is None:
+                raise DataNotFoundError()
         except DataNotFoundError:
             await context.message.channel.send('**Error**: Sorry, could not find professor!')
         else:
-            embed = discord.Embed(title=data['name'], url=data['url'], color=0x14532d)
-            embed.set_thumbnail(url='https://i.imgur.com/0eDVqDp.png')
+            embeds = []
 
-            embed.add_field(name='Top review', value=data['review'], inline=False)
-            embed.add_field(name='Rating', value=data['rating'] + '/5', inline=False)
-            embed.add_field(name='Difficulty', value=data['difficulty'], inline=False)
-            embed.add_field(name='Would take again', value=data['take_again'], inline=False)
+            for professor in professors:
+                embed = discord.Embed(title=professor['name'], description=professor['description'], url=professor['url'], color=0x1d4ed8)
+                embed.set_thumbnail(url='https://i.imgur.com/dwlne0a.png')
 
-            await context.message.channel.send(embed=embed)
+                embed.add_field(name='Top review', value=professor['top_review'], inline=False)
+                embed.add_field(name='Rating', value=professor['rating'] + '/5', inline=False)
+                embed.add_field(name='Difficulty', value=professor['difficulty'] + '/5', inline=False)
+                embed.add_field(name='Retake percentage', value=professor['retake_percentage'], inline=False)
+
+                embeds.append(embed)
+
+            await BotEmbedPaginator(context, embeds).run()
