@@ -18,8 +18,7 @@ class RMP(_Cog, name='rmp'):
             if next(c, None) is None:
                 raise DataNotFoundError()
         except DataNotFoundError:
-            embed = discord.Embed(title='Error', description='Sorry, could not find professor!', color=0xff0000, inline=False)
-            await context.channel.send(embed=embed)
+            await context.message.channel.send('**Error**: Sorry, could not find professor!')
         else:
             embeds = []
 
