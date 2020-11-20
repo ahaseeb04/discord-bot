@@ -1,11 +1,11 @@
 import discord
 from itertools import tee
 from discord.ext import commands
-from disputils import BotEmbedPaginator
 
 from ._cog import _Cog
 from scrapers import scrape_rmp
 from bot.exceptions import DataNotFoundError
+from bot.pagination.paginator import BotEmbedPaginator
 
 class RMP(_Cog, name='rmp'):
     @commands.command(brief="Fetch a professor's information from RateMyProfessors.", aliases=['prof'])
@@ -23,13 +23,15 @@ class RMP(_Cog, name='rmp'):
             embeds = []
 
             for professor in professors:
-                embed = discord.Embed(title=professor['name'], description=professor['description'], url=professor['url'], color=0x1d4ed8)
+                embed = discord.Embed(title=professor['name'], description=professor['department'], url=professor['url'], color=0x1d4ed8)
                 embed.set_thumbnail(url='https://i.imgur.com/dwlne0a.png')
 
                 if professor['top_review'] is not None:
                     embed.add_field(name='Top review', value=professor['top_review'], inline=False)
+
                 if professor['rating'] != 'N/A':
                     embed.add_field(name='Rating', value=professor['rating'], inline=False)
+
                 for label, rating in professor['feedback']:
                     embed.add_field(name=label, value=rating, inline=False)
 
