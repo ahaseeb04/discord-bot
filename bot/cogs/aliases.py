@@ -32,7 +32,7 @@ class Aliases(_Cog, name='aliases'):
         except IllegalFormatError:
             await context.channel.send('No alias provided')
         else:
-            await context.channel.send(f'Role "{alias}" has been set to "{role}"')
+            await context.channel.send(f'Alias "{alias}" has been mapped to "{role}" role.')
             df_to_sql(self.df, 'aliases', self.engine)
 
     @commands.has_permissions(manage_roles=True)
