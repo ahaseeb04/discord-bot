@@ -28,12 +28,11 @@ class RMP(_Cog, name='rmp'):
 
                 if professor['top_review'] is not None:
                     embed.add_field(name='Top review', value=professor['top_review'], inline=False)
-
                 if professor['rating'] != 'N/A':
-                    embed.add_field(name='Rating', value=professor['rating'], inline=False)
-
+                    embed.add_field(name='Rating', value=professor['rating'] + '/5', inline=False)
                 for label, rating in professor['feedback']:
-                    embed.add_field(name=label, value=rating, inline=False)
+                    text = rating if '%' in rating else rating + '/5'
+                    embed.add_field(name=label, value=text, inline=False)
 
                 embeds.append(embed)
 

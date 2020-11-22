@@ -1,7 +1,7 @@
 import bs4
 import requests
 
-def get_professor(professor_name):
+def get_professors(professor_name):
     name = '+'.join(professor_name)
     url = 'https://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=york+university&query=' + name + '&country=canada'
 
@@ -11,14 +11,13 @@ def get_professor(professor_name):
 
     for result in soup.find_all('li', class_='listing'):
         institution = result.find('span', class_='sub').text.lower()
-
         if 'york university' in institution and 'new' not in institution:
             yield result.find('a')['href']
 
 def scrape_rmp(professor_name):
     search = lambda s: { 'class': lambda e: e.startswith(s) if e else False }
 
-    for professor in get_professor(professor_name):
+    for professor in get_professors(professor_name):
         url = 'https://www.ratemyprofessors.com' + professor
         page = requests.get(url)
         soup = bs4.BeautifulSoup(page.content, 'html.parser')
@@ -35,7 +34,7 @@ def scrape_rmp(professor_name):
         def _scrape_feedback():
             for div in soup.find_all(attrs=search('FeedbackItem__StyledFeedbackItem')):
                 label = div.find(attrs=search('FeedbackItem__FeedbackDescription'))
-                rating = div.find(attrs= search('FeedbackItem__FeedbackNumber'))
+                rating = div.find(attrs=search('FeedbackItem__FeedbackNumber'))
                 yield (label.text, rating.text)
 
         def _scrape_top_review():
