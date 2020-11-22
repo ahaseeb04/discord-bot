@@ -1,17 +1,15 @@
 from pytz import timezone
 from datetime import date, datetime
-import time
 
-from tabulate import tabulate
+# from tabulate import tabulate
 from discord.ext import commands
 import aiocron
+import pandas as pd
+import redis
 
 from database_tools import engine, sql_to_df, df_to_sql, redis_access
 from bot import config
 from ._cog import _Cog
-
-import pandas as pd
-import redis
 
 class LastMessage(_Cog):
     def __init__(self, client):
@@ -32,7 +30,6 @@ class LastMessage(_Cog):
         self.df = await self.backup_redis()
         self.df = await self.check_verified()
         df_to_sql(self.df, 'last message', self.engine)
-
 
     # @commands.has_permissions(manage_roles=True)
     # @commands.command(hidden=True)
