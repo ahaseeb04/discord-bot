@@ -58,7 +58,7 @@ def scrape_course(course):
             if columns[2].text != 'Cancelled':
                 lect_type = columns[0].text
                 section['lectures'][lect_type] = {}
-                instructor = ', '.join(c.text for c in row.find_all('a'))
+                instructor = ', '.join(ins.text for ins in columns[3].find_all('a'))
                 if len(instructor) > 1:
                     section['lectures'][lect_type]['instructors'] = instructor
                 section['lectures'][lect_type]['lecture_info'] = []
