@@ -25,4 +25,4 @@ redis_url = os.getenv('REDIS_URL')
 redis_params = {
     'host': os.getenv('HOST', default='0.0.0.0'),
     'port': os.getenv('REDIS_PORT', default="6379")
-}
+} 
