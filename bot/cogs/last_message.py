@@ -81,7 +81,7 @@ class LastMessage(_Cog):
     @commands.command(hidden=True)
     async def set_days(self, context):
         days = context.message.content.split()[1]
-        os.system(f'config:set DEVERIFY_DAYS={days}')
+        os.system(f'heroku config:set DEVERIFY_DAYS={days}')
         # with open('.env') as e:
         #     print(e)
         # os.environ['DEVERIFY_DAYS'] = days
