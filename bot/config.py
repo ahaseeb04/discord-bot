@@ -13,6 +13,7 @@ engineering_channel = os.getenv('ENGINEERING_CHANNEL')
 stfuuuuu_aunk = os.getenv('STFUUUUU_AUNK')
 verified_role = os.getenv('VERIFIED_ROLE')
 postgres_url = os.getenv('DATABASE_URL')
+deverify_days = os.getenv('DEVERIFY_DAYS')
 postgres_params = {
     'drivername': os.getenv('POSTGRES_DRIVER'),
     'username': os.getenv('POSTGRES_USER'),
@@ -25,4 +26,4 @@ redis_url = os.getenv('REDIS_URL')
 redis_params = {
     'host': os.getenv('HOST', default='0.0.0.0'),
     'port': os.getenv('REDIS_PORT', default="6379")
-} 
+}
