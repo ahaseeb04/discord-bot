@@ -59,7 +59,7 @@ def scrape_course(course):
                 lect_type = columns[0].text
                 section['lectures'][lect_type] = {}
                 instructors = ', '.join(instructor.text for instructor in columns[3].find_all('a'))
-                if len(instructor) > 1:
+                if len(instructors) > 1:
                     section['lectures'][lect_type]['instructors'] = instructors
                 section['lectures'][lect_type]['lecture_info'] = []
                 for row in columns[1].find_all('tr'):
