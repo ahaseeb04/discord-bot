@@ -1,5 +1,6 @@
 from pytz import timezone
 from datetime import date, datetime
+import os
 
 # from tabulate import tabulate
 from discord.ext import commands
@@ -33,6 +34,9 @@ class LastMessage(_Cog):
 
     # @commands.has_permissions(manage_roles=True)
     # @commands.command(hidden=True)
+    # async def set_redis(self, context):
+    #     await self.backup_redis()
+
     async def backup_redis(self):
         data = self.redis.hgetall("users")
         df = pd.DataFrame.from_dict(data, orient='index', columns=['last message']).rename_axis('user id')
@@ -42,6 +46,9 @@ class LastMessage(_Cog):
 
     # @commands.has_permissions(manage_roles=True)
     # @commands.command(hidden=True)
+    # async def verifid(self, context):
+    #     await self.check_verified()
+
     async def check_verified(self):
         data = {}
         for user in self.client.get_all_members():
@@ -50,6 +57,37 @@ class LastMessage(_Cog):
         df = pd.DataFrame.from_dict(data, orient='index', columns=['verified', 'last message']).rename_axis('user id')
         df.update(self.df)
         return df.dropna(how="any", subset=['verified'])
+
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(hidden=True)
+    async def users(self, context):
+        await self.deverify_users()
+
+    async def deverify_users(self):
+        get_date = lambda row: datetime.strptime(row['last message'] or row['verified'], "%Y-%m-%d").date()
+        self.df['days'] = self.df.apply((lambda row: (date.today() - get_date(row)).days), axis=1)
+
+        guild = self.client.get_guild(int(config.server_id))
+        role = guild.get_role(int(config.verified_role))
+        for id in self.df.loc[self.df['days'] >= config.deverify_days].index:
+            await guild.get_member(int(id)).remove_roles(role)
+
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(hidden=True)
+    async def days(self, context):
+        print(config.deverify_days)
+
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(hidden=True)
+    async def set_days(self, context):
+        days = context.message.content.split()[1]
+        os.system(f'heroku config:set DEVERIFY_DAYS={days}')
+        # with open('.env') as e:
+        #     print(e)
+        # os.environ['DEVERIFY_DAYS'] = days
+        # print(os.environ['DEVERIFY_DAYS'])
+        # print(config.deverify_days)
+
 
     # @commands.has_permissions(manage_roles=True)
     # @commands.command(hidden=True)
