@@ -8,7 +8,7 @@ from bot.exceptions import DataNotFoundError
 from bot.pagination.paginator import BotEmbedPaginator
 
 class RMP(_Cog, name='rmp'):
-    @commands.command(brief="Fetch a professor's information from RateMyProfessors.", aliases=['prof'])
+    @commands.command(brief="Fetch a professor's information from RateMyProfessors.", aliases=['prof', 'professor'])
     async def rmp(self, context):
         professor_name = context.message.content.lower().split()[1:]
 
