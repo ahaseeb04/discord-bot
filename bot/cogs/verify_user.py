@@ -77,8 +77,8 @@ class VerifyUser(_Cog, name="verify"):
 
             await context.message.channel.send(f'{user} has been verified.')
 
-            df = sql_to_df('last message', eng, 'user id')
+            df = sql_to_df('last_message', eng, 'user_id')
             df.at[str(user.id), 'verified'] = date.today().isoformat()
-            df_to_sql(df, 'last message', eng)
+            df_to_sql(df, 'last_message', eng)
         finally:
             await context.message.clear_reactions()

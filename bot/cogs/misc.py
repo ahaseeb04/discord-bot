@@ -42,7 +42,8 @@ class StfuuuuuAunk(_Cog):
             chance = math.ceil(500**2 / (len(msg)**2 or 1))
             return not (chance and randrange(chance))
 
-        author = message.guild.get_member(message.author.id)
+        guild = self.client.get_guild(int(config.server_id))
+        author = guild.get_member(message.author.id)
         if author is not None and any(str(role.id) == config.stfuuuuu_aunk for role in author.roles) and fire(message.content):
             role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
             await message.channel.send(role.mention)
