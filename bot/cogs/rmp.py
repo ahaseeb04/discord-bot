@@ -1,11 +1,11 @@
 import discord
 from itertools import tee
 from discord.ext import commands
+from disputils import BotEmbedPaginator
 
 from ._cog import _Cog
 from scrapers import scrape_rmp
 from bot.exceptions import DataNotFoundError
-from bot.pagination.paginator import BotEmbedPaginator
 
 class RMP(_Cog, name='rmp'):
     @commands.command(brief="Fetch a professor's information from RateMyProfessors.", aliases=['prof'])

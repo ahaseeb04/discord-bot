@@ -3,13 +3,13 @@ from itertools import tee
 
 import discord
 from discord.ext import commands
+from disputils import BotEmbedPaginator
 
 from ._cog import _Cog
 from scrapers import scrape_course_list
 from bot.regex import course_list_regex
 from bot.errors import course_list_error
 from bot.embed_builder import EmbedBuilder
-from bot.pagination.paginator import BotEmbedPaginator
 from bot.exceptions import DataNotFoundError, IllegalFormatError
 
 class CourseList(_Cog, name='course'):
