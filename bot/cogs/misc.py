@@ -22,6 +22,12 @@ class Main(_Cog):
         else:
             print(error)
 
+    @_Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        if reaction.message.channel.id == int(config.verification_channel) and reaction.message.content.startswith(';verify'):
+            if not reaction.message.author.guild_permissions.manage_roles and str(user.id) != config.bot_id:
+                await reaction.message.remove_reaction(emoji=reaction.emoji, member=user)
+
 class CronJobs(_Cog, name='js'):
     def __init__(self, client):
         _Cog.__init__(self, client)
