@@ -29,10 +29,10 @@ class LastMessage(_Cog):
         if author is not None and any(str(role.id) == config.verified_role for role in author.roles):
             self.redis.hmset("users" , {message.author.id : date.today().isoformat()})
 
-    @commands.has_permissions(manage_roles=True)
-    @commands.command(hidden=True)
-    async def run_crons(self, context):
-        await self.cronjobs()
+    # @commands.has_permissions(manage_roles=True)
+    # @commands.command(hidden=True)
+    # async def run_crons(self, context):
+    #     await self.cronjobs()
 
     async def cronjobs(self):
         self.df = await self.backup_redis()
