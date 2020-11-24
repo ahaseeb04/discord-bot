@@ -70,7 +70,7 @@ class VerifyUser(_Cog, name="verify"):
             roles = { **roles, **aliases }
             
             await user.add_roles(*get_requested_roles())
-            await context.message.channel.send(f'{user} has been verified.')
+            await context.message.channel.send(f'{user.mention} has been verified.')
 
             df = sql_to_df('last_message', eng, 'user_id')
             df.at[str(user.id), 'verified'] = date.today().isoformat()
