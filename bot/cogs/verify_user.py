@@ -36,19 +36,12 @@ class VerifyUser(_Cog, name="verify"):
                 if requested is None:
                     requested = max(((ratio, role) for role in roles if (ratio := fuzz.partial_ratio(role, requested_role.lower())) > 70), default=None)
 
-                yield requested
+                if requested is not None and (role := roles.get(requested[1])) is not None:
+                    yield get(context.message.author.guild.roles, name=role)
 
         try:
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
-
-            eng = engine(url=config.postgres_url, params=config.postgres_params)
-            roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
-            aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
-
-            roles = { **roles, **aliases }
-
-            requested_roles = list(get_requested_roles())
 
             reactions = ['👍', '👎', '❌']
 
@@ -69,13 +62,15 @@ class VerifyUser(_Cog, name="verify"):
             print(e)
         else:
             user = context.message.author
-            for requested in requested_roles:
-                if requested is not None and len(role := roles.get(requested[1])):
-                    await user.add_roles(get(user.guild.roles, name=role))
 
-                    print(f'{role} role assigned.')
+            eng = engine(url=config.postgres_url, params=config.postgres_params)
+            roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
+            aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
 
-            await context.message.channel.send(f'{user} has been verified.')
+            roles = { **roles, **aliases }
+            
+            await user.add_roles(*get_requested_roles())
+            await context.message.channel.send(f'{user.mention} has been verified.')
 
             df = sql_to_df('last_message', eng, 'user_id')
             df.at[str(user.id), 'verified'] = date.today().isoformat()
