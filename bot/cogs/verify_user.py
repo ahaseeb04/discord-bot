@@ -68,10 +68,8 @@ class VerifyUser(_Cog, name="verify"):
             aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
 
             roles = { **roles, **aliases }
-
-            requested_roles = get_requested_roles()
             
-            await user.add_roles(*requested_roles)
+            await user.add_roles(*get_requested_roles())
             await context.message.channel.send(f'{user} has been verified.')
 
             df = sql_to_df('last_message', eng, 'user_id')
