@@ -19,6 +19,7 @@ class LastMessage(_Cog):
         self.redis = redis_access(url=config.redis_url, params=config.redis_params)
         self.engine = engine(url=config.postgres_url, params=config.postgres_params)
         self.df = sql_to_df('last_message', self.engine, 'user_id')
+        self.deverify_days = sql_to_df('deverify_days', self.engine, 'index')
         aiocron.crontab('0 3 * * *', func=self.cronjobs, tz=tz)
 
     @_Cog.listener()
@@ -76,8 +77,21 @@ class LastMessage(_Cog):
 
         guild = self.client.get_guild(int(config.server_id))
         role = guild.get_role(int(config.verified_role))
-        for id in self.df.loc[self.df['days'] >= int(config.deverify_days)].index:
+        for id in self.df.loc[self.df['days'] >= int(self.deverify_days)].index:
             await guild.get_member(int(id)).remove_roles(role)
+
+    @commands.has_permissions(manage_guild=True)
+    @commands.command()
+    async def deverify_days(self, context):
+        await context.message.channel.send(f'User de-verification is set to {self.deverify_days.iloc[0].days} days.')
+
+    @commands.has_permissions(manage_guild=True)
+    @commands.command()
+    async def set_deverify_days(self, context):
+        days = context.message.content.split()[1]
+        self.deverify_days.iloc[0].days = days
+        df_to_sql(self.deverify_days, 'deverify_days', self.engine)
+        await context.message.channel.send(f'Users de-verification has been set to {days} days.')
 
     # @commands.has_permissions(manage_roles=True)
     # @commands.command(hidden=True)
