@@ -29,16 +29,17 @@ class LastMessage(_Cog):
         if author is not None and any(str(role.id) == config.verified_role for role in author.roles):
             self.redis.hmset("users" , {message.author.id : date.today().isoformat()})
 
-    # @commands.has_permissions(manage_roles=True)
-    # @commands.command(hidden=True)
-    # async def run_crons(self, context):
-    #     await self.cronjobs()
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(hidden=True)
+    async def run_crons(self, context):
+        await self.cronjobs()
 
     async def cronjobs(self):
         self.df = await self.backup_redis()
         self.df = await self.check_verified()
-        df_to_sql(self.df, 'last_message', self.engine)
         await self.deverify_users()
+        self.df = await self.check_verified()
+        df_to_sql(self.df, 'last_message', self.engine)
 
     # @commands.has_permissions(manage_roles=True)
     # @commands.command(hidden=True)
@@ -77,21 +78,24 @@ class LastMessage(_Cog):
 
         guild = self.client.get_guild(int(config.server_id))
         role = guild.get_role(int(config.verified_role))
-        for id in self.df.loc[self.df['days'] >= int(self.deverify_days)].index:
+        for id in self.df.loc[self.df['days'] >= int(self.deverify_days.iloc[0].days)].index:
             await guild.get_member(int(id)).remove_roles(role)
 
     @commands.has_permissions(manage_guild=True)
     @commands.command()
-    async def deverify_days(self, context):
+    async def deverification_days(self, context):
         await context.message.channel.send(f'User de-verification is set to {self.deverify_days.iloc[0].days} days.')
 
     @commands.has_permissions(manage_guild=True)
     @commands.command()
-    async def set_deverify_days(self, context):
-        days = context.message.content.split()[1]
-        self.deverify_days.iloc[0].days = days
-        df_to_sql(self.deverify_days, 'deverify_days', self.engine)
-        await context.message.channel.send(f'Users de-verification has been set to {days} days.')
+    async def set_deverification_days(self, context):
+        days = context.message.content.split()
+        if len(days) > 1:
+            self.deverify_days.iloc[0].days = days[1]
+            df_to_sql(self.deverify_days, 'deverify_days', self.engine)
+            await context.message.channel.send(f'Users de-verification has been set to {days[1]} days.')
+        else:
+            await context.message.channel.send('**Error**: Must specify number of days')
 
     # @commands.has_permissions(manage_roles=True)
     # @commands.command(hidden=True)
