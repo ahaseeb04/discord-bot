@@ -16,11 +16,9 @@ def _sql_to_csv(table, engine):
     df.to_csv(f'database_tools/support/{table}.csv', index=False)
 
 def sql_to_df(table, engine, index):
-    try:
-        return pd.read_sql(table, engine).set_index(index)
-    except ProgrammingError:
+    if not engine.dialect.has_table(engine, table):
         _csv_to_sql(table, engine, index)
-        return sql_to_df(table, engine, index)
+    return pd.read_sql(table, engine).set_index(index)
 
 def df_to_sql(df, table, engine):
     df.to_sql(table, engine, if_exists='replace')
