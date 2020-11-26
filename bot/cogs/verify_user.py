@@ -48,7 +48,7 @@ class VerifyUser(_Cog, name="verify"):
             for reaction in reactions:
                 await context.message.add_reaction(emoji=reaction)
 
-            await get_user(context, context.message.author)
+            await context.message.channel.send(embed=get_user(context, context.message.author))
 
             await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
         except IllegalFormatError:

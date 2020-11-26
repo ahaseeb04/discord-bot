@@ -29,10 +29,10 @@ class LastMessage(_Cog):
         if author is not None and any(str(role.id) == config.verified_role for role in author.roles):
             self.redis.hmset("users" , {message.author.id : date.today().isoformat()})
 
-    # @commands.has_permissions(manage_roles=True)
-    # @commands.command(hidden=True)
-    # async def run_crons(self, context):
-    #     await self.cronjobs()
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(hidden=True)
+    async def run_crons(self, context):
+        await self.cronjobs()
 
     async def cronjobs(self):
         self.df = await self.backup_redis()
@@ -82,16 +82,16 @@ class LastMessage(_Cog):
             await guild.get_member(int(id)).remove_roles(role)
 
     @commands.has_permissions(manage_guild=True)
-    @commands.command()
+    @commands.command(aliases=['get_dever'])
     async def deverification_days(self, context):
-        await context.message.channel.send(f'User de-verification is set to {self.deverify_days.iloc[0].days} days.')
+        await context.message.channel.send(f'User de-verification is set to {self.deverify_days.at[0, "days"]} days.')
 
     @commands.has_permissions(manage_guild=True)
-    @commands.command()
+    @commands.command(aliases=['set_dever'])
     async def set_deverification_days(self, context):
         days = context.message.content.split()
         if len(days) > 1:
-            self.deverify_days.iloc[0].days = days[1]
+            self.deverify_days.at[0, 'days'] = days[1]
             df_to_sql(self.deverify_days, 'deverify_days', self.engine)
             await context.message.channel.send(f'Users de-verification has been set to {days[1]} days.')
         else:
