@@ -7,7 +7,7 @@ def get_professors(professor_name):
 
     page = requests.get(url)
 
-    soup = bs4.BeautifulSoup(page.content, 'html.parser')
+    soup = bs4.BeautifulSoup(page.content, 'html.parser', from_encoding='UTF-8')
 
     for result in soup.find_all('li', class_='listing'):
         institution = result.find('span', class_='sub').text.lower()
@@ -20,7 +20,7 @@ def scrape_rmp(professor_name):
     for professor in get_professors(professor_name):
         url = 'https://www.ratemyprofessors.com' + professor
         page = requests.get(url)
-        soup = bs4.BeautifulSoup(page.content, 'html.parser')
+        soup = bs4.BeautifulSoup(page.content, 'html.parser', from_encoding='UTF-8')
 
         def _scrape_name():
             return soup.find(attrs=search('NameTitle__Name')).text.strip()
@@ -30,6 +30,10 @@ def scrape_rmp(professor_name):
 
         def _scrape_rating():
             return soup.find(attrs=search('RatingValue__Numerator')).text
+
+        def _scrape_based_on_count():
+            number = soup.find(attrs=search('RatingValue__NumRatings')).find('a').text.split()[0]
+            return f'{number} rating' if number == '1' else f'{number} ratings'
 
         def _scrape_feedback():
             for div in soup.find_all(attrs=search('FeedbackItem__StyledFeedbackItem')):
@@ -46,6 +50,7 @@ def scrape_rmp(professor_name):
         professor['name'] = _scrape_name()
         professor['department'] = _scrape_department()
         professor['rating'] = _scrape_rating()
+        professor['based_on_count'] = _scrape_based_on_count()
         professor['feedback'] = list(_scrape_feedback())[::-1]
         professor['top_review'] = next(_scrape_top_review(), None)
 
