@@ -5,10 +5,11 @@ from fuzzywuzzy import fuzz
 from discord.utils import get
 from discord.ext import commands
 
-from bot import config
-from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError
 from ._cog import _Cog
+from bot import config
+from bot.utils import get_user
 from database_tools import df_to_dict, sql_to_df, dict_to_df, df_to_sql, engine
+from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError
 
 class VerifyUser(_Cog, name="verify"):
     @commands.command(brief='Request roles for yourself.')
@@ -44,9 +45,10 @@ class VerifyUser(_Cog, name="verify"):
                 raise WrongChannelError()
 
             reactions = ['👍', '👎', '❌']
-
             for reaction in reactions:
                 await context.message.add_reaction(emoji=reaction)
+
+            await get_user(context, context.message.author)
 
             await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
         except IllegalFormatError:
@@ -68,7 +70,7 @@ class VerifyUser(_Cog, name="verify"):
             aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
 
             roles = { **roles, **aliases }
-            
+
             await user.add_roles(*get_requested_roles())
             await context.message.channel.send(f'{user.mention} has been verified.')
 
