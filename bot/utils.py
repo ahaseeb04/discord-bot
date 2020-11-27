@@ -25,6 +25,6 @@ def get_user(context, user):
         embed.add_field(name="Last message", value=last_message.strftime('%a %b %-d, %Y'), inline=False)
 
     if len(roles) > 0:
-        embed.add_field(name=f'Roles [{len(roles)}]', value=' '.join(roles), inline=False)
+        embed.add_field(name=f'Roles [{len(roles)}]', value=' '.join(roles[::-1]), inline=False)
 
     return embed
