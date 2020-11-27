@@ -44,22 +44,25 @@ class VerifyUser(_Cog, name="verify"):
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
 
+            await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
+
+            logs = self.client.get_channel(int(config.verification_logs_channel))
+            user_embed = await logs.send(content=context.message.content, embed=get_user(context, context.message.author))
+
             reactions = ['👍', '👎', '❌']
             for reaction in reactions:
-                await context.message.add_reaction(emoji=reaction)
+                await user_embed.add_reaction(emoji=reaction)
 
-            await context.message.channel.send(embed=get_user(context, context.message.author))
-
-            await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
+            await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
         except IllegalFormatError:
             channel = self.client.get_channel(int(config.verification_rules_channel))
-            await context.message.channel.send(f'{context.message.author.mention} Sorry, please check {channel.mention} and try again!')
+            await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification requested was rejected, please check {channel.mention} and try again!')
         except NotApprovedError:
             await context.message.author.kick()
             await context.message.channel.send(f'{context.message.author} has been kicked from server.')
         except WrongChannelError:
             channel = self.client.get_channel(int(config.verification_channel))
-            await context.message.channel.send(f'Command "verify" can only be used in {channel.mention}.')
+            await context.message.channel.send(f'The verification command can only be used in {channel.mention}.')
         except asyncio.TimeoutError as e:
             print(e)
         else:
@@ -78,4 +81,4 @@ class VerifyUser(_Cog, name="verify"):
             df.at[str(user.id), 'verified'] = date.today().isoformat()
             df_to_sql(df, 'last_message', eng)
         finally:
-            await context.message.clear_reactions()
+            await user_embed.clear_reactions()
