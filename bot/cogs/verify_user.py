@@ -44,18 +44,18 @@ class VerifyUser(_Cog, name="verify"):
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
 
-            logs_channel = self.client.get_channel(int(config.verification_logs_channel))
-            message = await logs_channel.send(f'{context.message.author.mention} is now waiting for approval in {context.message.channel.mention}.')
-
             await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
+
+            logs_channel = self.client.get_channel(int(config.verification_logs_channel))
+            await logs_channel.send(context.message.content)
+
+            user_embed = await logs_channel.send(embed=get_user(context, context.message.author))
 
             reactions = ['👍', '👎', '❌']
             for reaction in reactions:
-                await message.add_reaction(emoji=reaction)
+                await user_embed.add_reaction(emoji=reaction)
 
-            await logs_channel.send(embed=get_user(context, context.message.author))
-
-            await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(message))
+            await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
         except IllegalFormatError:
             channel = self.client.get_channel(int(config.verification_rules_channel))
             await context.message.channel.send(f'{context.message.author.mention} Sorry, please check {channel.mention} and try again!')
@@ -83,4 +83,4 @@ class VerifyUser(_Cog, name="verify"):
             df.at[str(user.id), 'verified'] = date.today().isoformat()
             df_to_sql(df, 'last_message', eng)
         finally:
-            await message.clear_reactions()
+            await user_embed.clear_reactions()
