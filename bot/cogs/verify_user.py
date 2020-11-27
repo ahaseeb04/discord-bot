@@ -46,10 +46,10 @@ class VerifyUser(_Cog, name="verify"):
 
             await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
 
-            logs_channel = self.client.get_channel(int(config.verification_logs_channel))
-            await logs_channel.send(context.message.content)
+            logs = self.client.get_channel(int(config.verification_logs_channel))
+            await logs.send(context.message.content)
 
-            user_embed = await logs_channel.send(embed=get_user(context, context.message.author))
+            user_embed = await logs.send(embed=get_user(context, context.message.author))
 
             reactions = ['👍', '👎', '❌']
             for reaction in reactions:
