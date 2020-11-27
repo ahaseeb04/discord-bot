@@ -16,14 +16,13 @@ class VerifyUser(_Cog, name="verify"):
     async def verify(self, context):
         def check_reaction(message):
             def check(reaction, user):
-                has_permissions = lambda perms: getattr(user.guild_permissions, perms) and str(user.id) != config.bot_id
                 is_correct_reaction = lambda emoji: reaction.message.id == message.id and reaction.emoji == emoji
 
-                if is_correct_reaction('👍') and has_permissions('manage_roles'):
+                if is_correct_reaction('👍') and str(user.id) != config.bot_id:
                     return True
-                if is_correct_reaction('👎') and has_permissions('manage_roles'):
+                if is_correct_reaction('👎') and str(user.id) != config.bot_id:
                     raise IllegalFormatError()
-                if is_correct_reaction('❌') and has_permissions('kick_members'):
+                if is_correct_reaction('❌') and str(user.id) != config.bot_id:
                     raise NotApprovedError()
 
             return check
