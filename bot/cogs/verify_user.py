@@ -44,13 +44,18 @@ class VerifyUser(_Cog, name="verify"):
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
 
+            logs_channel = self.client.get_channel(int(config.verification_logs_channel))
+            message = await logs_channel.send(f'{context.message.author.mention} is now waiting for approval in {context.message.channel.mention}.')
+
+            await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
+
             reactions = ['👍', '👎', '❌']
             for reaction in reactions:
-                await context.message.add_reaction(emoji=reaction)
+                await message.add_reaction(emoji=reaction)
 
-            await context.message.channel.send(embed=get_user(context, context.message.author))
+            await logs_channel.send(embed=get_user(context, context.message.author))
 
-            await self.client.wait_for('reaction_add', timeout=86400, check=check_reaction(context.message))
+            await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(message))
         except IllegalFormatError:
             channel = self.client.get_channel(int(config.verification_rules_channel))
             await context.message.channel.send(f'{context.message.author.mention} Sorry, please check {channel.mention} and try again!')
@@ -59,7 +64,7 @@ class VerifyUser(_Cog, name="verify"):
             await context.message.channel.send(f'{context.message.author} has been kicked from server.')
         except WrongChannelError:
             channel = self.client.get_channel(int(config.verification_channel))
-            await context.message.channel.send(f'Command "verify" can only be used in {channel.mention}.')
+            await context.message.channel.send(f'The verification command can only be used in {channel.mention}.')
         except asyncio.TimeoutError as e:
             print(e)
         else:
@@ -78,4 +83,4 @@ class VerifyUser(_Cog, name="verify"):
             df.at[str(user.id), 'verified'] = date.today().isoformat()
             df_to_sql(df, 'last_message', eng)
         finally:
-            await context.message.clear_reactions()
+            await message.clear_reactions()
