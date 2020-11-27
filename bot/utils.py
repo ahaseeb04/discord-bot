@@ -1,13 +1,13 @@
 import discord
 from datetime import datetime
 
-
-from database_tools import engine, sql_to_df
+from database_tools import engine, sql_to_df, redis_access
 from bot import config
 
 def get_user(context, user):
     eng = engine(url=config.postgres_url, params=config.postgres_params)
     df = sql_to_df('last_message', eng, 'user_id')
+    redis = redis_access(url=config.redis_url, params=config.redis_params)
 
     roles = [ role.mention for role in user.roles if role.name != '@everyone' ]
     color = user.color if len(roles) > 0 or str(user.color) != '#000000' else 0xdb2777
@@ -19,7 +19,7 @@ def get_user(context, user):
 
     embed.add_field(name='Registered', value=user.created_at.strftime("%a %b %-d, %Y @ %-I:%M %p"), inline=False)
     embed.add_field(name='Joined at', value=user.joined_at.strftime("%a %b %-d, %Y @ %-I:%M %p"), inline=False)
-    if (last_message := df.last_message.get(str(user.id))) is not None:
+    if (last_message := redis.hmget('users', str(user.id))[0] or df.last_message.get(str(user.id))) is not None:
         last_message = datetime.strptime(last_message, "%Y-%m-%d")
         embed.add_field(name="Last Message", value=last_message.strftime('%a %b %-d, %Y'), inline=False)
 
