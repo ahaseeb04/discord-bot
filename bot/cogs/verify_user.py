@@ -47,7 +47,11 @@ class VerifyUser(_Cog, name="verify"):
             await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
 
             logs = self.client.get_channel(int(config.verification_logs_channel))
-            user_embed = await logs.send(content=context.message.content, embed=get_user(context, context.message.author))
+
+            user_embed = get_user(context, context.message.author)
+            user_embed.add_field(name='Requested roles', value=context.message.content)
+
+            user_embed = await logs.send(embed=user_embed)
 
             reactions = ['👍', '👎', '❌']
             for reaction in reactions:
@@ -56,7 +60,7 @@ class VerifyUser(_Cog, name="verify"):
             await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
         except IllegalFormatError:
             channel = self.client.get_channel(int(config.verification_rules_channel))
-            await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification requested was rejected, please check {channel.mention} and try again!')
+            await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification request was rejected, please check {channel.mention} and try again!')
         except NotApprovedError:
             await context.message.author.kick()
             await context.message.channel.send(f'{context.message.author} has been kicked from server.')

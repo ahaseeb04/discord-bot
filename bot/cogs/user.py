@@ -10,13 +10,13 @@ class User(_Cog, name="user"):
     async def user(self, context):
         try:
             if not len(context.message.raw_mentions) \
-                and not len(context.message.channel_mentions)\
+                and not len(context.message.channel_mentions) \
                 and not len(context.message.role_mentions):
                     raise IllegalFormatError()
 
             if not len(context.message.mentions):
                 raise DataNotFoundError()
-            
+
             embeds = [get_user(context, user) for user in context.message.mentions]
 
         except IllegalFormatError:
