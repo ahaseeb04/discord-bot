@@ -56,7 +56,7 @@ class VerifyUser(_Cog, name="verify"):
             await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
         except IllegalFormatError:
             channel = self.client.get_channel(int(config.verification_rules_channel))
-            await context.message.channel.send(f'{context.message.author.mention} Sorry, please check {channel.mention} and try again!')
+            await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification requested was rejected, please check {channel.mention} and try again!')
         except NotApprovedError:
             await context.message.author.kick()
             await context.message.channel.send(f'{context.message.author} has been kicked from server.')
