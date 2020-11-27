@@ -14,12 +14,12 @@ class Aliases(_Cog, name='aliases'):
         self.df = sql_to_df('aliases', self.engine, 'alias')
 
     @commands.has_permissions(manage_roles=True)
-    @commands.command(brief="Get a List of aliases")
+    @commands.command(brief="Get all the aliases.")
     async def aliases(self, context):
         await context.channel.send(f"```\n{tabulate(self.df, headers='keys', tablefmt='psql')}```")
 
     @commands.has_permissions(manage_roles=True)
-    @commands.command(brief="Add/Update alias")
+    @commands.command(brief="Add or update an alias.")
     async def alias(self, context):
         try:
             data = {i : val.strip() for i, val in enumerate(context.message.content.split(self.client.command_prefix)[2:4])}
@@ -36,7 +36,7 @@ class Aliases(_Cog, name='aliases'):
             df_to_sql(self.df, 'aliases', self.engine)
 
     @commands.has_permissions(manage_roles=True)
-    @commands.command(brief="Remove alias")
+    @commands.command(brief="Remove an alias.")
     async def unalias(self, context):
         try:
             data = context.message.content.split(self.client.command_prefix)[2:3]
