@@ -2,7 +2,7 @@ from discord.ext import commands
 from disputils import BotEmbedPaginator
 
 from bot.utils import get_user
-from bot.exceptions import DataNotFoundError, IllegalFormatError
+from bot.exceptions import DataNotFoundError
 from ._cog import _Cog
 
 class User(_Cog, name="user"):
