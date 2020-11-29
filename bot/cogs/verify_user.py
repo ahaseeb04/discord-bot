@@ -27,8 +27,7 @@ class VerifyUser(_Cog, name="verify"):
 
             return check
 
-        def get_requested_roles():
-            requested_roles = [ role.strip() for role in context.message.content.split(self.client.command_prefix) ]
+        def get_requested_roles(requested_roles):
 
             for requested_role in requested_roles:
                 requested = max(((ratio, role) for role in roles if (ratio := fuzz.token_sort_ratio(role, requested_role)) > 70), default=None)
@@ -40,8 +39,14 @@ class VerifyUser(_Cog, name="verify"):
                     yield get(context.message.author.guild.roles, name=role)
 
         try:
+            user_embed = None
+
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
+
+            requested_roles = [item.strip() for item in context.message.content.split(self.client.command_prefix) if item]
+            if len(requested_roles) == 1 and len(context.message.content.split()) > 1:
+                raise IllegalFormatError()
 
             await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
 
@@ -52,8 +57,7 @@ class VerifyUser(_Cog, name="verify"):
 
             user_embed = await logs.send(embed=user_embed)
 
-            reactions = ['👍', '👎', '❌']
-            for reaction in reactions:
+            for reaction in ['👍', '👎', '❌']:
                 await user_embed.add_reaction(emoji=reaction)
 
             await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
@@ -77,11 +81,12 @@ class VerifyUser(_Cog, name="verify"):
 
             roles = { **roles, **aliases }
 
-            await user.add_roles(*get_requested_roles())
+            await user.add_roles(*get_requested_roles(requested_roles))
             await context.message.channel.send(f'{user.mention} has been verified.')
 
             df = sql_to_df('last_message', eng, 'user_id')
             df.at[str(user.id), 'verified'] = date.today().isoformat()
             df_to_sql(df, 'last_message', eng)
         finally:
-            await user_embed.clear_reactions()
+            if user_embed is not None:
+                await user_embed.clear_reactions()

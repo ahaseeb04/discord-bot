@@ -9,6 +9,7 @@ from discord.ext import commands
 
 from ._cog import _Cog
 from bot import config
+from .verify_user import VerifyUser
 
 class Main(_Cog):
     @_Cog.listener()
@@ -17,12 +18,23 @@ class Main(_Cog):
 
     @_Cog.listener()
     async def on_command_error(self, context, error):
-        if isinstance(error, commands.CommandNotFound):
+        if context.message.channel.id == int(config.verification_channel) and context.message.content.startswith(';verify'):
+            await VerifyUser.verify(self, context)
+        elif isinstance(error, commands.CommandNotFound):
             await context.message.channel.send(error)
+        elif isinstance(error, commands.MissingPermissions):
+            err = context.message.content.split()[0].strip(';')
+            await context.message.channel.send(f'Command "{err}" is not found')
         else:
             print(error)
 
-class CronJobs(_Cog, name='js'):
+    @_Cog.listener()
+    async def on_message(self, message):
+        if message.channel.id == int(config.verification_channel) and message.content.startswith('verify'):
+            channel = self.client.get_channel(int(config.verification_rules_channel))
+            await message.channel.send(f'{message.author.mention} Sorry, your verification request was rejected, please check {channel.mention} and try again!')
+
+class CronJobs(_Cog):
     def __init__(self, client):
         _Cog.__init__(self, client)
         tz = timezone('US/Eastern')

@@ -9,10 +9,8 @@ class User(_Cog, name="user"):
     @commands.command(brief='Fetch details for a user.', aliases=['member', 'u', 'whois'])
     async def user(self, context):
         try:
-            if not len(context.message.raw_mentions) \
-                and not len(context.message.channel_mentions) \
-                and not len(context.message.role_mentions):
-                    raise IllegalFormatError()
+            if len(context.message.content.split()) == 1:
+                raise IllegalFormatError()
 
             if not len(context.message.mentions):
                 raise DataNotFoundError()
@@ -22,6 +20,6 @@ class User(_Cog, name="user"):
         except IllegalFormatError:
             await context.message.channel.send(embed=get_user(context, context.message.author))
         except DataNotFoundError:
-            await context.message.channel.send('**Error**: Sorry, could not find user!')
+            await context.message.channel.send('**Error**: Sorry, No valid user specified.')
         else:
             await BotEmbedPaginator(context, embeds).run()
