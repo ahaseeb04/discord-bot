@@ -1,6 +1,5 @@
 from pytz import timezone
 import datetime as dt
-import os
 
 from tabulate import tabulate
 from discord.ext import commands

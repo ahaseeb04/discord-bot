@@ -1,5 +1,6 @@
 import datetime as dt
 from pytz import timezone
+import asyncio
 
 import discord
 import pandas as pd
@@ -8,7 +9,8 @@ from database_tools import engine, sql_to_df, redis_access
 from bot import config
 from database_tools import engine, sql_to_df
 
-def get_user(context, user):
+async def get_user(context, user):
+    await asyncio.sleep(0.01)
     eng = engine(url=config.postgres_url, params=config.postgres_params)
     df = sql_to_df('last_message', eng, 'user_id')
     redis = redis_access(url=config.redis_url, params=config.redis_params)
