@@ -1,5 +1,5 @@
 from pytz import timezone
-from datetime import date
+import datetime as dt
 import os
 
 from tabulate import tabulate
@@ -62,7 +62,7 @@ class LastMessage(_Cog):
         data = {}
         for user in self.client.get_all_members():
             if any(str(role.id) == config.verified_role for role in user.roles):
-                data[str(user.id)] = [date.today().isoformat(), None]
+                data[str(user.id)] = [dt.date.today().isoformat(), None]
         df = pd.DataFrame.from_dict(data, orient='index', columns=['verified','last_message']).rename_axis('user_id')
         df.update(self.df)
         return df.dropna(how="any", subset=['verified'])
@@ -74,7 +74,7 @@ class LastMessage(_Cog):
 
     async def deverify_users(self):
         get_date = lambda row: pd.to_datetime(max(row['last_message'] or '0', row['verified'])).date()
-        self.df['days'] = self.df.apply((lambda row: (date.today() - get_date(row)).days), axis=1)
+        self.df['days'] = self.df.apply((lambda row: (dt.date.today() - get_date(row)).days), axis=1)
 
         guild = self.client.get_guild(int(config.server_id))
         role = guild.get_role(int(config.verified_role))
