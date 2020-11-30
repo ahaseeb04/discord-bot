@@ -14,11 +14,11 @@ class User(_Cog, name="user"):
                 raise DataNotFoundError()
             
         except DataNotFoundError:
-            await context.message.channel.send('**Error**: Sorry, No valid user specified.')
+            await context.message.channel.send('**Error**: Sorry, please specify a valid user.')
         else:
             await BotEmbedPaginator(context, embeds).run()
 
-    @commands.command(brief='Fetch details for the current user.')
+    @commands.command(brief='Fetch details about yourself.')
     async def me(self, context):
         await context.message.channel.send(embed=get_user(context, context.message.author))
 
