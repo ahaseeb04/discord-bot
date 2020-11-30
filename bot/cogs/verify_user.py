@@ -52,7 +52,7 @@ class VerifyUser(_Cog, name="verify"):
 
             logs = self.client.get_channel(int(config.verification_logs_channel))
 
-            user_embed = get_user(context, context.message.author)
+            user_embed = await get_user(context, context.message.author)
             user_embed.add_field(name='Requested roles', value=context.message.content)
 
             user_embed = await logs.send(embed=user_embed)
