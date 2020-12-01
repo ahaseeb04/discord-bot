@@ -70,7 +70,7 @@ class VerifyUser(_Cog, name="verify"):
         except WrongChannelError:
             channel = self.client.get_channel(int(config.verification_channel))
             await context.message.channel.send(f'Command "verify" is not found')
-        except asyncio.TimeoutError as e:
+        except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)
         else:
             user = context.message.author
