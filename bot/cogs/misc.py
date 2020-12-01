@@ -59,3 +59,9 @@ class StfuuuuuAunk(_Cog):
         if author is not None and any(str(role.id) == config.stfuuuuu_aunk for role in author.roles) and fire(message.content):
             role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
             await message.channel.send(role.mention)
+
+class DestinySucks(_Cog):
+    @_Cog.listener(name='on_message')
+    async def destiny_sucks(self, message):
+        if message.author.id == int(config.tek) and 'destiny' in message.content.lower():
+            await message.channel.send('Destiny is ass')
