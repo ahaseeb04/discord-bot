@@ -1,6 +1,6 @@
 import math
 from pytz import timezone
-from random import randrange
+from random import randrange, randint
 
 import aiocron
 import discord
@@ -63,5 +63,5 @@ class StfuuuuuAunk(_Cog):
 class DestinySucks(_Cog):
     @_Cog.listener(name='on_message')
     async def destiny_sucks(self, message):
-        if message.author.id == int(config.tek) and 'destiny' in message.content.lower():
+        if 'destiny' in message.content.lower() and randint(1, 100) % 5 == 0:
             await message.channel.send('Destiny is ass')
