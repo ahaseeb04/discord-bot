@@ -9,3 +9,6 @@ class DataNotFoundError(Exception):
 
 class WrongChannelError(Exception):
     pass
+
+class ShouldBeBannedError(Exception):
+    pass

@@ -9,7 +9,7 @@ from ._cog import _Cog
 from bot import config
 from bot.utils import get_user
 from database_tools import df_to_dict, sql_to_df, dict_to_df, df_to_sql, engine
-from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError
+from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError, ShouldBeBannedError
 
 class VerifyUser(_Cog, name="verify"):
     @commands.command(brief='Request roles for yourself.', hidden=True)
@@ -22,8 +22,10 @@ class VerifyUser(_Cog, name="verify"):
                     return True
                 if is_correct_reaction('👎') and str(user.id) != config.bot_id:
                     raise IllegalFormatError()
-                if is_correct_reaction('❌') and str(user.id) != config.bot_id:
+                if is_correct_reaction('🥾') and str(user.id) != config.bot_id:
                     raise NotApprovedError()
+                if is_correct_reaction('🔨') and str(user.id) != config.bot_id:
+                    raise ShouldBeBannedError()
 
             return check
 
@@ -44,7 +46,7 @@ class VerifyUser(_Cog, name="verify"):
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
 
-            requested_roles = [item.strip() for item in context.message.content.split(self.client.command_prefix) if item]
+            requested_roles = [ item.strip() for item in context.message.content.split(self.client.command_prefix) if item ]
             if len(requested_roles) == 1 and len(context.message.content.split()) > 1:
                 raise IllegalFormatError()
 
@@ -57,7 +59,7 @@ class VerifyUser(_Cog, name="verify"):
 
             user_embed = await logs.send(embed=user_embed)
 
-            for reaction in ['👍', '👎', '❌']:
+            for reaction in ['👍', '👎', '🥾', '🔨']:
                 await user_embed.add_reaction(emoji=reaction)
 
             await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
@@ -70,6 +72,10 @@ class VerifyUser(_Cog, name="verify"):
         except WrongChannelError:
             channel = self.client.get_channel(int(config.verification_channel))
             await context.message.channel.send(f'Command "verify" is not found')
+        except ShouldBeBannedError:
+            channel = self.client.get_channel(int(config.verification_logs_channel))
+            await context.message.author.ban()
+            await channel.send(f'{context.message.author.mention} has been banned from the server.')
         except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)
         else:
