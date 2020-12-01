@@ -40,12 +40,16 @@ class CronJobs(_Cog):
         tz = timezone('US/Eastern')
         aiocron.crontab('0 10 * * *', func=self.daily_reminder, tz=tz)
         aiocron.crontab('0 10 * * *', func=self.daily_hey, tz=tz)
+        aiocron.crontab('0 19 * * *', func=self.daily_destiny_sucks, tz=tz)
 
     async def daily_reminder(self):
         await self.client.get_channel(int(config.cs_channel)).send("Daily reminder js is ass")
 
     async def daily_hey(self):
         await self.client.get_channel(int(config.engineering_channel)).send("Hey")
+
+    async def daily_destiny_sucks(self):
+        await self.client.get_channel(int(config.general)).send("Daily reminder Destiny is ass")
 
 class StfuuuuuAunk(_Cog):
     @_Cog.listener(name='on_message')
@@ -63,5 +67,5 @@ class StfuuuuuAunk(_Cog):
 class DestinySucks(_Cog):
     @_Cog.listener(name='on_message')
     async def destiny_sucks(self, message):
-        if 'destiny' in message.content.lower() and randint(1, 100) % 5 == 0:
+        if 'destiny' in message.content.lower() and randint(1, 100) % 5 == 0 and message.author.id != int(config.bot_id):
             await message.channel.send('Destiny is ass')

@@ -5,6 +5,7 @@ load_dotenv()
 
 token = os.getenv('TOKEN')
 server_id = os.getenv('SERVER_ID')
+general = os.getenv('GENERAL')
 verification_channel = os.getenv('VERIFICATION_CHANNEL')
 verification_rules_channel = os.getenv('VERIFICATION_RULES_CHANNEL')
 verification_logs_channel = os.getenv('VERIFICATION_LOGS_CHANNEL')
