@@ -12,7 +12,7 @@ from database_tools import df_to_dict, sql_to_df, dict_to_df, df_to_sql, engine
 from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError
 
 class VerifyUser(_Cog, name="verify"):
-    @commands.command(brief='Request roles for yourself.')
+    @commands.command(brief='Request roles for yourself.', hidden=True)
     async def verify(self, context):
         def check_reaction(message):
             def check(reaction, user):
@@ -69,7 +69,7 @@ class VerifyUser(_Cog, name="verify"):
             await context.message.channel.send(f'{context.message.author} has been kicked from server.')
         except WrongChannelError:
             channel = self.client.get_channel(int(config.verification_channel))
-            await context.message.channel.send(f'The verification command can only be used in {channel.mention}.')
+            await context.message.channel.send(f'Command "verify" is not found')
         except asyncio.TimeoutError as e:
             print(e)
         else:
