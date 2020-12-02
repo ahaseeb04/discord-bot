@@ -6,7 +6,6 @@ import discord
 from discord.ext import commands
 from disputils import BotEmbedPaginator
 
-from bot import config
 from ._cog import _Cog
 from scrapers import scrape_course
 from bot.errors import course_error
