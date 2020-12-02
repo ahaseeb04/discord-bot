@@ -18,12 +18,13 @@ class Main(_Cog):
 
     @_Cog.listener()
     async def on_command_error(self, context, error):
-        if context.message.channel.id == int(config.verification_channel) and context.message.content.startswith(';verify;'):
+        pr = self.client.command_prefix
+        if context.message.channel.id == int(config.verification_channel) and context.message.content.startswith(f'{pr}verify{pr}'):
             await VerifyUser.verify(self, context)
         elif isinstance(error, commands.CommandNotFound):
             await context.message.channel.send(error)
         elif isinstance(error, commands.MissingPermissions):
-            err = context.message.content.split()[0].strip(';')
+            err = context.message.content.split()[0].strip(pr)
             await context.message.channel.send(f'Command "{err}" is not found')
         else:
             print(error)
@@ -38,18 +39,22 @@ class CronJobs(_Cog):
     def __init__(self, client):
         _Cog.__init__(self, client)
         tz = timezone('US/Eastern')
-        aiocron.crontab('0 10 * * *', func=self.daily_reminder, tz=tz)
-        aiocron.crontab('0 10 * * *', func=self.daily_hey, tz=tz)
-        aiocron.crontab('0 19 * * *', func=self.daily_destiny_sucks, tz=tz)
+        
+        @aiocron.crontab('0 10 * * *', tz=tz)
+        async def js():
+            await self.daily_reminder(config.cs_channel, "Daily reminder js is ass")
 
-    async def daily_reminder(self):
-        await self.client.get_channel(int(config.cs_channel)).send("Daily reminder js is ass")
+        @aiocron.crontab('0 10 * * *', tz=tz)
+        async def hey():
+            await self.daily_reminder(config.engineering_channel, "Hey")
 
-    async def daily_hey(self):
-        await self.client.get_channel(int(config.engineering_channel)).send("Hey")
+        @aiocron.crontab('0 19 * * *', tz=tz)
+        async def destiny():
+            await self.daily_reminder(config.gaming_channel, "Daily reminder Destiny is ass")
 
-    async def daily_destiny_sucks(self):
-        await self.client.get_channel(int(config.general)).send("Daily reminder Destiny is ass")
+    async def daily_reminder(self, channel, message):
+        await self.client.get_channel(int(channel)).send(message)
+
 
 class StfuuuuuAunk(_Cog):
     @_Cog.listener(name='on_message')
