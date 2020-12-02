@@ -18,7 +18,7 @@ class Main(_Cog):
 
     @_Cog.listener()
     async def on_command_error(self, context, error):
-        if context.message.channel.id == int(config.verification_channel) and context.message.content.startswith(';verify'):
+        if context.message.channel.id == int(config.verification_channel) and context.message.content.startswith(';verify;'):
             await VerifyUser.verify(self, context)
         elif isinstance(error, commands.CommandNotFound):
             await context.message.channel.send(error)
