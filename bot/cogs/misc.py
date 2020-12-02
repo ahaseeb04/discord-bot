@@ -31,8 +31,8 @@ class Main(_Cog):
     @_Cog.listener()
     async def on_message(self, message):
         if message.channel.id == int(config.verification_channel) and message.content.startswith('verify'):
-            channel = self.client.get_channel(int(config.verification_rules_channel))
-            await message.channel.send(f'{message.author.mention} Sorry, your verification request was rejected, please check {channel.mention} and try again!')
+            context = await self.client.get_context(message)
+            await VerifyUser.verify(self, context)
 
 class CronJobs(_Cog):
     def __init__(self, client):
