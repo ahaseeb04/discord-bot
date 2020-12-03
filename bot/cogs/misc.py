@@ -48,7 +48,7 @@ class CronJobs(_Cog):
         async def hey():
             await self.daily_reminder(config.engineering_channel, "Hey")
 
-        @aiocron.crontab('15 19 * * *', tz=tz)
+        @aiocron.crontab('0 19 * * *', tz=tz)
         async def destiny():
             await self.daily_reminder(config.gaming_channel, "Daily reminder Destiny is ass")
 
