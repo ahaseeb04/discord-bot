@@ -18,7 +18,7 @@ class RMP(_Cog, name='rmp'):
             if next(test, None) is None:
                 raise DataNotFoundError()
         except DataNotFoundError:
-            await context.message.channel.send('Sorry, this command does not work anymore. It will be updated in the coming days.')
+            await context.message.channel.send('**Error**: Sorry, could not find professor!')
         else:
             embeds = []
 
