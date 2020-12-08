@@ -46,5 +46,5 @@ class StfuuuuuAunk(_Cog):
 class DestinySucks(_Cog):
     @_Cog.listener(name='on_message')
     async def destiny_sucks(self, message):
-        if 'destiny' in message.content.lower() and not randint(0, 19) and message.author.id != int(config.bot_id):
+        if 'destiny' in message.content.lower() and not randint(0, 3) and message.author.id != int(config.bot_id):
             await message.channel.send('Destiny is ass')
