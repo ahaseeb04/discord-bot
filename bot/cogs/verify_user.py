@@ -6,8 +6,8 @@ from discord.utils import get
 from discord.ext import commands
 
 from ._cog import _Cog
+from .user import get_user
 from bot import config
-from bot.utils import get_user
 from database_tools import df_to_dict, sql_to_df, dict_to_df, df_to_sql, engine
 from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError, ShouldBeBannedError
 
@@ -17,14 +17,15 @@ class VerifyUser(_Cog, name="verify"):
         def check_reaction(message):
             def check(reaction, user):
                 is_correct_reaction = lambda emoji: reaction.message.id == message.id and reaction.emoji == emoji
+                is_bot = lambda user: str(user.id) == config.bot_id
 
-                if is_correct_reaction('👍') and str(user.id) != config.bot_id:
+                if is_correct_reaction('👍') and not is_bot(user):
                     return True
-                if is_correct_reaction('👎') and str(user.id) != config.bot_id:
+                if is_correct_reaction('👎') and not is_bot(user):
                     raise IllegalFormatError()
-                if is_correct_reaction('🥾') and str(user.id) != config.bot_id:
+                if is_correct_reaction('🥾') and not is_bot(user):
                     raise NotApprovedError()
-                if is_correct_reaction('🔨') and str(user.id) != config.bot_id:
+                if is_correct_reaction('🔨') and not is_bot(user):
                     raise ShouldBeBannedError()
 
             return check
