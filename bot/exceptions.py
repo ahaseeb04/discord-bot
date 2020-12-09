@@ -1,14 +1,20 @@
-class IllegalFormatError(Exception):
+import abc
+
+class CustomError(abc.ABC, Exception):
+    def __init__(self, user=None):
+        self.user = user
+
+class IllegalFormatError(CustomError):
     pass
 
-class NotApprovedError(Exception):
+class NotApprovedError(CustomError):
     pass
 
-class DataNotFoundError(Exception):
+class DataNotFoundError(CustomError):
     pass
 
-class WrongChannelError(Exception):
+class WrongChannelError(CustomError):
     pass
 
-class ShouldBeBannedError(Exception):
+class ShouldBeBannedError(CustomError):
     pass

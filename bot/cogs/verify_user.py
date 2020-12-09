@@ -22,11 +22,11 @@ class VerifyUser(_Cog, name="verify"):
                 if is_correct_reaction('👍') and not is_bot(user):
                     return True
                 if is_correct_reaction('👎') and not is_bot(user):
-                    raise IllegalFormatError()
+                    raise IllegalFormatError(user)
                 if is_correct_reaction('🥾') and not is_bot(user):
-                    raise NotApprovedError()
+                    raise NotApprovedError(user)
                 if is_correct_reaction('🔨') and not is_bot(user):
-                    raise ShouldBeBannedError()
+                    raise ShouldBeBannedError(user)
 
             return check
 
@@ -63,24 +63,24 @@ class VerifyUser(_Cog, name="verify"):
             for reaction in ['👍', '👎', '🥾', '🔨']:
                 await user_embed.add_reaction(emoji=reaction)
 
-            await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
-        except IllegalFormatError:
+            reaction, user = await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
+        except IllegalFormatError as e:
             channel = self.client.get_channel(int(config.verification_rules_channel))
             await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification request was rejected, please check {channel.mention} and try again!')
-        except NotApprovedError:
+            await logs.send(f'{context.message.author} has been rejected by {e.user}')
+        except NotApprovedError as e:
             await context.message.author.kick()
-            await context.message.channel.send(f'{context.message.author} has been kicked from server.')
+            await logs.send(f'{context.message.author} has been kicked by {e.user}.')
         except WrongChannelError:
             channel = self.client.get_channel(int(config.verification_channel))
             await context.message.channel.send(f'Command "verify" is not found')
-        except ShouldBeBannedError:
-            channel = self.client.get_channel(int(config.verification_logs_channel))
+        except ShouldBeBannedError as e:
             await context.message.author.ban()
-            await channel.send(f'{context.message.author.mention} has been banned from the server.')
+            await logs.send(f'{context.message.author} has been banned by {e.user}')
         except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)
         else:
-            user = context.message.author
+            member = context.message.author
 
             eng = engine(url=config.postgres_url, params=config.postgres_params)
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
@@ -88,11 +88,12 @@ class VerifyUser(_Cog, name="verify"):
 
             roles = { **roles, **aliases }
 
-            await user.add_roles(*get_requested_roles(requested_roles))
-            await context.message.channel.send(f'{user.mention} has been verified.')
+            await member.add_roles(*get_requested_roles(requested_roles))
+            await context.message.channel.send(f'{member.mention} has been verified.')
+            await logs.send(f'{member} has been accepted by {user}.')
 
             df = sql_to_df('last_message', eng, 'user_id')
-            df.at[str(user.id), 'verified'] = date.today().isoformat()
+            df.at[str(member.id), 'verified'] = date.today().isoformat()
             df_to_sql(df, 'last_message', eng)
         finally:
             if user_embed is not None:
