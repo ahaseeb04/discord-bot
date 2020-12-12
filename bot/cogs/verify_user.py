@@ -11,7 +11,7 @@ from bot import config
 from database_tools import df_to_dict, sql_to_df, dict_to_df, df_to_sql, engine
 from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError, ShouldBeBannedError
 
-class VerifyUser(_Cog, name="verify"):
+class VerifyUser(_Cog, name='verify'):
     @commands.command(brief='Request roles for yourself.', hidden=True)
     async def verify(self, context):
         def check_reaction(message):
@@ -31,7 +31,6 @@ class VerifyUser(_Cog, name="verify"):
             return check
 
         def get_requested_roles(requested_roles):
-
             for requested_role in requested_roles:
                 requested = max(((ratio, role) for role in roles if (ratio := fuzz.token_sort_ratio(role, requested_role)) > 70), default=None)
 
@@ -67,16 +66,15 @@ class VerifyUser(_Cog, name="verify"):
         except IllegalFormatError as e:
             channel = self.client.get_channel(int(config.verification_rules_channel))
             await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification request was rejected, please check {channel.mention} and try again!')
-            await logs.send(f'{context.message.author} has been rejected by {e.user}')
+            await logs.send(f'{context.message.author.mention} has been rejected by {e.user}.')
         except NotApprovedError as e:
             await context.message.author.kick()
-            await logs.send(f'{context.message.author} has been kicked by {e.user}.')
+            await logs.send(f'{context.message.author.mention} has been kicked by {e.user}.')
         except WrongChannelError:
-            channel = self.client.get_channel(int(config.verification_channel))
             await context.message.channel.send(f'Command "verify" is not found')
         except ShouldBeBannedError as e:
             await context.message.author.ban()
-            await logs.send(f'{context.message.author} has been banned by {e.user}')
+            await logs.send(f'{context.message.author.mention} has been banned by {e.user}.')
         except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)
         else:
@@ -90,7 +88,7 @@ class VerifyUser(_Cog, name="verify"):
 
             await member.add_roles(*get_requested_roles(requested_roles))
             await context.message.channel.send(f'{member.mention} has been verified.')
-            await logs.send(f'{member} has been verified by {user}.')
+            await logs.send(f'{member.mention} has been verified by {user}.')
 
             df = sql_to_df('last_message', eng, 'user_id')
             df.at[str(member.id), 'verified'] = date.today().isoformat()
