@@ -43,6 +43,8 @@ class VerifyUser(_Cog, name="verify"):
 
         try:
             user_embed = None
+            member = context.message.author
+            logs = self.client.get_channel(int(config.verification_logs_channel))
 
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
@@ -53,10 +55,17 @@ class VerifyUser(_Cog, name="verify"):
 
             await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
 
-            logs = self.client.get_channel(int(config.verification_logs_channel))
+            eng = engine(url=config.postgres_url, params=config.postgres_params)
+            roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
+            aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
 
+            roles = { **roles, **aliases }
+
+            requested_roles = list(get_requested_roles(requested_roles))
+            
             user_embed = await get_user(context, context.message.author)
-            user_embed.add_field(name='Requested roles', value=context.message.content)
+            user_embed.add_field(name='Requested roles', value=context.message.content, inline=False)
+            user_embed.add_field(name='Parsed roles', value=' '.join(role.mention for role in requested_roles), inline=False)
 
             user_embed = await logs.send(embed=user_embed)
 
@@ -64,6 +73,8 @@ class VerifyUser(_Cog, name="verify"):
                 await user_embed.add_reaction(emoji=reaction)
 
             reaction, user = await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
+
+            await member.add_roles(*requested_roles)
         except IllegalFormatError as e:
             channel = self.client.get_channel(int(config.verification_rules_channel))
             await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification request was rejected, please check {channel.mention} and try again!')
@@ -80,15 +91,13 @@ class VerifyUser(_Cog, name="verify"):
         except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)
         else:
-            member = context.message.author
+            # eng = engine(url=config.postgres_url, params=config.postgres_params)
+            # roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles if not role.hoist}
+            # aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
 
-            eng = engine(url=config.postgres_url, params=config.postgres_params)
-            roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
-            aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
+            # roles = { **roles, **aliases }
 
-            roles = { **roles, **aliases }
-
-            await member.add_roles(*get_requested_roles(requested_roles))
+            # await member.add_roles(*get_requested_roles(requested_roles))
             await context.message.channel.send(f'{member.mention} has been verified.')
             await logs.send(f'{member} has been accepted by {user}.')
 
