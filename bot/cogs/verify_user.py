@@ -74,7 +74,6 @@ class VerifyUser(_Cog, name="verify"):
 
             reaction, user = await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
 
-            await member.add_roles(*requested_roles)
         except IllegalFormatError as e:
             channel = self.client.get_channel(int(config.verification_rules_channel))
             await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification request was rejected, please check {channel.mention} and try again!')
@@ -97,7 +96,7 @@ class VerifyUser(_Cog, name="verify"):
 
             # roles = { **roles, **aliases }
 
-            # await member.add_roles(*get_requested_roles(requested_roles))
+            await member.add_roles(*requested_roles)
             await context.message.channel.send(f'{member.mention} has been verified.')
             await logs.send(f'{member} has been accepted by {user}.')
 
