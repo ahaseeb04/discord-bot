@@ -16,16 +16,16 @@ class VerifyUser(_Cog, name='verify'):
     async def verify(self, context):
         def check_reaction(message):
             def check(reaction, user):
-                is_reaction = lambda emoji: reaction.message.id == message.id and reaction.emoji == emoji
+                is_correct_reaction = lambda emoji: reaction.message.id == message.id and reaction.emoji == emoji
                 is_bot = lambda user: str(user.id) == config.bot_id
 
-                if is_reaction('👍') and not is_bot(user):
+                if is_correct_reaction('👍') and not is_bot(user):
                     return True
-                if is_reaction('👎') and not is_bot(user):
+                if is_correct_reaction('👎') and not is_bot(user):
                     raise IllegalFormatError(user)
-                if is_reaction('🥾') and not is_bot(user):
+                if is_correct_reaction('🥾') and not is_bot(user):
                     raise NotApprovedError(user)
-                if is_reaction('🔨') and not is_bot(user):
+                if is_correct_reaction('🔨') and not is_bot(user):
                     raise ShouldBeBannedError(user)
 
             return check
