@@ -54,7 +54,6 @@ class VerifyUser(_Cog, name="verify"):
                 raise IllegalFormatError()
 
             await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
-            await logs.send(f"?warnings {member.mention}")
 
             eng = engine(url=config.postgres_url, params=config.postgres_params)
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
