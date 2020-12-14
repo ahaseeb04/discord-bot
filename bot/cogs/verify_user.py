@@ -16,16 +16,16 @@ class VerifyUser(_Cog, name='verify'):
     async def verify(self, context):
         def check_reaction(message):
             def check(reaction, user):
-                is_correct_reaction = lambda emoji: reaction.message.id == message.id and reaction.emoji == emoji
+                is_reaction = lambda emoji: reaction.message.id == message.id and reaction.emoji == emoji
                 is_bot = lambda user: str(user.id) == config.bot_id
 
-                if is_correct_reaction('👍') and not is_bot(user):
+                if is_reaction('👍') and not is_bot(user):
                     return True
-                if is_correct_reaction('👎') and not is_bot(user):
+                if is_reaction('👎') and not is_bot(user):
                     raise IllegalFormatError(user)
-                if is_correct_reaction('🥾') and not is_bot(user):
+                if is_reaction('🥾') and not is_bot(user):
                     raise NotApprovedError(user)
-                if is_correct_reaction('🔨') and not is_bot(user):
+                if is_reaction('🔨') and not is_bot(user):
                     raise ShouldBeBannedError(user)
 
             return check
@@ -43,7 +43,6 @@ class VerifyUser(_Cog, name='verify'):
         try:
             user_embed = None
             member = context.message.author
-            logs = self.client.get_channel(int(config.verification_logs_channel))
 
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
@@ -61,18 +60,18 @@ class VerifyUser(_Cog, name='verify'):
             roles = { **roles, **aliases }
 
             requested_roles = list(get_requested_roles(requested_roles))
-            
+
             user_embed = await get_user(context, context.message.author)
             user_embed.add_field(name='Requested roles', value=context.message.content, inline=False)
             user_embed.add_field(name='Parsed roles', value=' '.join(role.mention for role in requested_roles), inline=False)
 
+            logs = self.client.get_channel(int(config.verification_logs_channel))
             user_embed = await logs.send(embed=user_embed)
 
             for reaction in ['👍', '👎', '🥾', '🔨']:
                 await user_embed.add_reaction(emoji=reaction)
 
             reaction, user = await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
-
         except IllegalFormatError as e:
             channel = self.client.get_channel(int(config.verification_rules_channel))
             await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification request was rejected, please check {channel.mention} and try again!')
@@ -88,10 +87,11 @@ class VerifyUser(_Cog, name='verify'):
         except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)
         else:
-
             await member.add_roles(*requested_roles)
-            await context.message.channel.send(f'{member.mention} has been verified.')
             await logs.send(f'{member.mention} has been verified by {user}.')
+
+            welcome = self.client.get_channel(int(config.welcome_channel))
+            await welcome.send(f'{member.mention} Welcome to the server. You have been verified!')
 
             df = sql_to_df('last_message', eng, 'user_id')
             df.at[str(member.id), 'verified'] = date.today().isoformat()
