@@ -53,6 +53,7 @@ class VerifyUser(_Cog, name='verify'):
                 raise IllegalFormatError()
 
             await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
+            await logs.send(f"?warnings {member.mention}")
 
             eng = engine(url=config.postgres_url, params=config.postgres_params)
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
@@ -88,11 +89,6 @@ class VerifyUser(_Cog, name='verify'):
         except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)
         else:
-            # eng = engine(url=config.postgres_url, params=config.postgres_params)
-            # roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles if not role.hoist}
-            # aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
-
-            # roles = { **roles, **aliases }
 
             await member.add_roles(*requested_roles)
             await context.message.channel.send(f'{member.mention} has been verified.')
