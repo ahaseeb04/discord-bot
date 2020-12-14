@@ -91,7 +91,7 @@ class VerifyUser(_Cog, name='verify'):
             await logs.send(f'{member.mention} has been verified by {user}.')
 
             welcome = self.client.get_channel(int(config.welcome_channel))
-            await welcome.send(f'{member.mention} Welcome to the server. You have been verified!')
+            await welcome.send(f'{member.mention} Welcome to the server! You have been verified.')
 
             df = sql_to_df('last_message', eng, 'user_id')
             df.at[str(member.id), 'verified'] = date.today().isoformat()
