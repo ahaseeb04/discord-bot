@@ -10,9 +10,7 @@ def get_professors(professor_name):
     soup = bs4.BeautifulSoup(page.content, 'html.parser', from_encoding='UTF-8')
 
     for result in soup.find_all('li', class_='listing'):
-        institution = result.find('span', class_='sub').text.lower()
-        if 'york university' in institution and 'new' not in institution:
-            yield result.find('a')['href']
+        yield result.find('a')['href']
 
 def scrape_rmp(professor_name):
     search = lambda s: { 'class': lambda e: e.startswith(s) if e else False }
