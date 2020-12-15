@@ -45,13 +45,14 @@ def scrape_rmp(professor_name):
             for div in soup.find_all(attrs=search('Comments__StyledComments'), limit=1):
                 yield div.text
 
-        professor = {}
-        professor['url'] = url
-        professor['name'] = _scrape_name()
-        professor['department'] = _scrape_department()
-        professor['rating'] = _scrape_rating()
-        professor['based_on_count'] = _scrape_based_on_count()
-        professor['feedback'] = list(_scrape_feedback())[::-1]
-        professor['top_review'] = next(_scrape_top_review(), None)
+        professor = {
+            'url': url,
+            'name': _scrape_name(),
+            'department': _scrape_department(),
+            'rating': _scrape_rating(),
+            'based_on_count': _scrape_based_on_count(),
+            'feedback': list(_scrape_feedback())[::-1],
+            'top_review': next(_scrape_top_review(), None)
+        }
 
         yield professor
