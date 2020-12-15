@@ -15,42 +15,36 @@ def get_professors(professor_name):
 def scrape_rmp(professor_name):
     search = lambda s: { 'class': lambda e: e.startswith(s) if e else False }
 
+    def _scrape_field(soup, field):
+        return soup.find(attrs=search(field)).text.strip()
+
+    def _scrape_based_on_count(soup):
+        return soup.find(attrs=search('RatingValue__NumRatings')).find('a').text.split()[0]
+
+    def _scrape_feedback(soup):
+        for div in soup.find_all(attrs=search('FeedbackItem__StyledFeedbackItem')):
+            label = _scrape_field(div, 'FeedbackItem__FeedbackDescription')
+            rating = _scrape_field(div, 'FeedbackItem__FeedbackNumber')
+
+            yield (label, rating)
+
+    def _scrape_top_review(soup):
+        for div in soup.find_all(attrs=search('Comments__StyledComments'), limit=1):
+            yield div.text
+
     for professor in get_professors(professor_name):
         url = 'https://www.ratemyprofessors.com' + professor
         page = requests.get(url)
         soup = bs4.BeautifulSoup(page.content, 'html.parser', from_encoding='UTF-8')
 
-        def _scrape_name():
-            return soup.find(attrs=search('NameTitle__Name')).text.strip()
-
-        def _scrape_department():
-            return soup.find(attrs=search('NameTitle__Title')).text
-
-        def _scrape_rating():
-            return soup.find(attrs=search('RatingValue__Numerator')).text
-
-        def _scrape_based_on_count():
-            number = soup.find(attrs=search('RatingValue__NumRatings')).find('a').text.split()[0]
-            return f'{number} rating' if number == '1' else f'{number} ratings'
-
-        def _scrape_feedback():
-            for div in soup.find_all(attrs=search('FeedbackItem__StyledFeedbackItem')):
-                label = div.find(attrs=search('FeedbackItem__FeedbackDescription'))
-                rating = div.find(attrs=search('FeedbackItem__FeedbackNumber'))
-                yield (label.text, rating.text)
-
-        def _scrape_top_review():
-            for div in soup.find_all(attrs=search('Comments__StyledComments'), limit=1):
-                yield div.text
-
         professor = {
             'url': url,
-            'name': _scrape_name(),
-            'department': _scrape_department(),
-            'rating': _scrape_rating(),
-            'based_on_count': _scrape_based_on_count(),
-            'feedback': list(_scrape_feedback())[::-1],
-            'top_review': next(_scrape_top_review(), None)
+            'name': _scrape_field(soup, 'NameTitle__Name'),
+            'department': _scrape_field(soup, 'NameTitle__Title'),
+            'rating': _scrape_field(soup, 'RatingValue__Numerator'),
+            'based_on_count': _scrape_based_on_count(soup),
+            'feedback': list(_scrape_feedback(soup))[::-1],
+            'top_review': next(_scrape_top_review(soup), None)
         }
 
         yield professor
