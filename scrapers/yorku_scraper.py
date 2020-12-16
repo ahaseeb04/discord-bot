@@ -40,47 +40,47 @@ def scrape_course_list(course):
         yield from _scrape_faculty(faculty)
     
 def scrape_course(course):
-    def scrape_heading(soup):
+    def _scrape_heading(soup):
         return soup.find(class_="heading").text
 
-    def scrape_description(soup):
+    def _scrape_description(soup):
         return soup.find_all('table')[2].find_all('p')[3].text
 
-    def scrape_section(soup):
-        section = {}
+    def _scrape_lecture(soup, labels):
+        def _scrape_lecture_info(soup):
+            lecture_info = { label : row.text for label, row in zip(labels, soup) }
+            if columns[4].find(string= lambda t: "backup" in t.lower()) is not None:
+                lecture_info['Backup'] = 'backup'
+            return lecture_info
+
+        columns = soup.find_all('td', recursive=False)
+        if columns[2].text != 'Cancelled':
+            return ( columns[0].text, {
+                'instructors': ', '.join(instructor.text for instructor in columns[3].find_all('a')),
+                'lecture_info': [_scrape_lecture_info(row) for row in columns[1].find_all('tr')]
+            })
+
+    def _scrape_section(soup):
         rows = soup.find_all('tr')[2].table
         labels = [r.text for r in rows.td.next_sibling.find_all('b')]
 
-        section['section_info'] = ' '.join(soup.tr.stripped_strings)
-        section['lectures'] = {}
-        for row in islice(rows, 1, None):
-            columns = row.find_all('td', recursive=False)
-            if columns[2].text != 'Cancelled':
-                lect_type = columns[0].text
-                section['lectures'][lect_type] = {}
-                instructors = ', '.join(instructor.text for instructor in columns[3].find_all('a'))
-                if len(instructors) > 1:
-                    section['lectures'][lect_type]['instructors'] = instructors
-                section['lectures'][lect_type]['lecture_info'] = []
-                for row in columns[1].find_all('tr'):
-                    lec = { l : r.text for l, r in zip(labels, row) }
-                    if columns[4].find(string= lambda t: "backup" in t.lower()) is not None:
-                        lec['Backup'] = 'backup'
-                    section['lectures'][lect_type]['lecture_info'].append(lec)
-        return section
+        return {
+            'section_info': ' '.join(soup.tr.stripped_strings),
+            'lectures': dict(lecture for row in islice(rows, 1, None) if (lecture := _scrape_lecture(row, labels)) is not None)
+        }
         
     for URL in scrape_course_list(course):
         if URL[0].split()[1].startswith(course['course']):
             page = requests.get(URL[2])
             soup = bs4.BeautifulSoup(page.content, 'html.parser')
 
-            crs = {}
-            crs['heading'] = scrape_heading(soup)
-            crs['description'] = scrape_description(soup)
             sections = filter(lambda s: isinstance(s, bs4.element.Tag), soup.find_all('table')[6])
-            crs['sections'] = list(map(scrape_section, sections))
-            crs['url'] = URL[2]
-            yield crs
+            yield {
+                'heading': _scrape_heading(soup),
+                'description': _scrape_description(soup),
+                'sections': [_scrape_section(section) for section in sections],
+                'url': URL[2]
+            }
 
 if __name__ == "__main__":
     import re

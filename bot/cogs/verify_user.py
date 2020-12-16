@@ -43,13 +43,15 @@ class VerifyUser(_Cog, name='verify'):
         try:
             user_embed = None
             member = context.message.author
+            logs = self.client.get_channel(int(config.verification_logs_channel))
 
             if context.message.channel.id != int(config.verification_channel):
                 raise WrongChannelError()
 
             requested_roles = [ item.strip() for item in context.message.content.split(self.client.command_prefix) if item ]
             if len(requested_roles) == 1 and len(context.message.content.split()) > 1:
-                raise IllegalFormatError()
+                bot = context.message.guild.get_member(int(config.bot_id))
+                raise IllegalFormatError(bot)
 
             await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
 
@@ -65,7 +67,6 @@ class VerifyUser(_Cog, name='verify'):
             user_embed.add_field(name='Requested roles', value=context.message.content, inline=False)
             user_embed.add_field(name='Parsed roles', value=' '.join(role.mention for role in requested_roles), inline=False)
 
-            logs = self.client.get_channel(int(config.verification_logs_channel))
             user_embed = await logs.send(embed=user_embed)
 
             for reaction in ['👍', '👎', '🥾', '🔨']:

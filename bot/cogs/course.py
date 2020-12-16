@@ -72,7 +72,7 @@ class Course(_Cog, name="course"):
             for name, lecture in section['lectures'].items():
                 if len(lecture['lecture_info']) > 0:
                     yield (
-                        f"{name}: {lecture.get('instructors', 'Not Available')}",
+                        f"{name}: {lecture['instructors'] or 'Not Available'}",
                         '\n'.join(_format_lectures(lecture['lecture_info'])),
                     )
 
