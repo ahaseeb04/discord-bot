@@ -75,20 +75,20 @@ class VerifyUser(_Cog, name='verify'):
         except IllegalFormatError as e:
             channel = self.client.get_channel(int(config.verification_rules_channel))
             await context.message.channel.send(f'{context.message.author.mention} Sorry, your verification request was rejected, please check {channel.mention} and try again!')
-            await logs.send(f'{context.message.author.mention} has been rejected by {e.user}.')
+            await logs.send(f'{context.message.author.mention} has been rejected by {e.user.display_name}.')
         except NotApprovedError as e:
             await context.message.author.kick()
-            await logs.send(f'{context.message.author.mention} has been kicked by {e.user}.')
+            await logs.send(f'{context.message.author.mention} has been kicked by {e.user.display_name}.')
         except WrongChannelError:
             await context.message.channel.send(f'Command "verify" is not found')
         except ShouldBeBannedError as e:
             await context.message.author.ban()
-            await logs.send(f'{context.message.author.mention} has been banned by {e.user}.')
+            await logs.send(f'{context.message.author.mention} has been banned by {e.user.display_name}.')
         except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)
         else:
             await member.add_roles(*requested_roles)
-            await logs.send(f'{member.mention} has been verified by {user.mention}.')
+            await logs.send(f'{member.mention} has been verified by {user.display_name}.')
 
             welcome = self.client.get_channel(int(config.welcome_channel))
             await welcome.send(f'{member.mention} Welcome to the server! You have been verified.')
