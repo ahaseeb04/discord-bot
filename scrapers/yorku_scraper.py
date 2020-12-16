@@ -57,12 +57,12 @@ def scrape_course(course):
         if columns[2].text != 'Cancelled':
             return (columns[0].text, {
                 'instructors': ', '.join(instructor.text for instructor in columns[3].find_all('a')),
-                'lecture_info': [_scrape_lecture_info(row) for row in columns[1].find_all('tr')]
+                'lecture_info': [ _scrape_lecture_info(row) for row in columns[1].find_all('tr') ]
             })
 
     def _scrape_section(soup):
         rows = soup.find_all('tr')[2].table
-        labels = [r.text for r in rows.td.next_sibling.find_all('b')]
+        labels = [ r.text for r in rows.td.next_sibling.find_all('b') ]
 
         return {
             'section_info': ' '.join(soup.tr.stripped_strings),
