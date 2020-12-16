@@ -88,7 +88,7 @@ class VerifyUser(_Cog, name='verify'):
             print(e)
         else:
             await member.add_roles(*requested_roles)
-            await logs.send(f'{member.mention} has been verified by {user}.')
+            await logs.send(f'{member.mention} has been verified by {user.mention}.')
 
             welcome = self.client.get_channel(int(config.welcome_channel))
             await welcome.send(f'{member.mention} Welcome to the server! You have been verified.')
