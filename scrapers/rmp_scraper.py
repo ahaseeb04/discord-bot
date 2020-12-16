@@ -37,7 +37,7 @@ def scrape_rmp(professor_name):
         page = requests.get(url)
         soup = bs4.BeautifulSoup(page.content, 'html.parser', from_encoding='UTF-8')
 
-        professor = {
+        yield {
             'url': url,
             'name': _scrape_field(soup, 'NameTitle__Name'),
             'department': _scrape_field(soup, 'NameTitle__Title'),
@@ -46,5 +46,3 @@ def scrape_rmp(professor_name):
             'feedback': list(_scrape_feedback(soup))[::-1],
             'top_review': next(_scrape_top_review(soup), None)
         }
-
-        yield professor
