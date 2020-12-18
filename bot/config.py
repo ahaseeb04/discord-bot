@@ -3,20 +3,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-token = os.getenv('TOKEN')
-bot_id = os.getenv('BOT_ID')
-server_id = os.getenv('SERVER_ID')
+def get(key, default=None):
+    return os.getenv(key.upper(), default)
 
-welcome_channel = os.getenv('WELCOME_CHANNEL')
-verification_channel = os.getenv('VERIFICATION_CHANNEL')
-verification_logs_channel = os.getenv('VERIFICATION_LOGS_CHANNEL')
-verification_rules_channel = os.getenv('VERIFICATION_RULES_CHANNEL')
-
-cs_channel = os.getenv('CS_CHANNEL')
-gaming_channel = os.getenv('GAMING_CHANNEL')
-engineering_channel = os.getenv('ENGINEERING_CHANNEL')
-
-verified_role = os.getenv('VERIFIED_ROLE')
+def __getattr__(attribute):
+    return get(attribute)
 
 postgres_url = os.getenv('DATABASE_URL')
 postgres_params = {
@@ -33,6 +24,3 @@ redis_params = {
     'host': os.getenv('HOST', default='0.0.0.0'),
     'port': os.getenv('REDIS_PORT', default='6379')
 }
-
-stfuuuuu_aunk = os.getenv('STFUUUUU_AUNK')
-deverify_days = os.getenv('DEVERIFY_DAYS')
