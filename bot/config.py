@@ -3,11 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def get(key, default=None):
-    return os.getenv(key.upper(), default)
-
 def __getattr__(attribute):
-    return get(attribute)
+    return os.getenv(attribute.upper())
 
 postgres_url = os.getenv('DATABASE_URL')
 postgres_params = {
