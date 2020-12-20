@@ -3,10 +3,8 @@ import requests
 
 def get_professors(professor_name):
     name = '+'.join(professor_name)
-    url = 'https://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=york+university&query=' + name + '&country=canada'
-
+    url = ''.join(('https://www.ratemyprofessors.com/search.jsp?queryBy=teacherName&schoolName=york+university&query=', name, '&country=canada'))
     page = requests.get(url)
-
     soup = bs4.BeautifulSoup(page.content, 'html.parser', from_encoding='UTF-8')
 
     for result in soup.find_all('li', class_='listing'):
@@ -33,7 +31,7 @@ def scrape_rmp(professor_name):
             yield div.text
 
     for professor in get_professors(professor_name):
-        url = 'https://www.ratemyprofessors.com' + professor
+        url = ''.join(('https://www.ratemyprofessors.com', professor))
         page = requests.get(url)
         soup = bs4.BeautifulSoup(page.content, 'html.parser', from_encoding='UTF-8')
 

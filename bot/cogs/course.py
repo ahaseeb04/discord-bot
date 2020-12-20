@@ -32,9 +32,14 @@ class Course(_Cog, name="course"):
                     tmp.add_field(name=name, value=value, inline=False)
                 if len(tmp.get_fields()) > 1:
                     embeds.insert_embed(tmp)
-            if len(embeds.get_fields()) > 0:
-                return embeds
-            return []
+            if len(embeds.get_fields()) == 0:
+                tmp = EmbedBuilder()
+                tmp.add_field(
+                    name="No Sections Found", 
+                    value="**This course listing may be a duplicate. There may be other listings with valid sections.*"
+                )
+                embeds.insert_embed(tmp)
+            return embeds
 
         def _format_section(section):
             def _format_lectures(lectures):
@@ -64,10 +69,10 @@ class Course(_Cog, name="course"):
                 def _format_backup(backup):
                     return f' ({backup})' if backup is not None else ''
 
-                yield _format_day(lecture['Day'])
-                yield _format_times(lecture['Start Time'], lecture['Duration'])
-                yield _format_location(lecture['Location'])
-                yield _format_backup(lecture.get('Backup'))
+                yield _format_day(lecture['day'])
+                yield _format_times(lecture['start time'], lecture['duration'])
+                yield _format_location(lecture['location'])
+                yield _format_backup(lecture.get('backup'))
 
             for name, lecture in section['lectures'].items():
                 if len(lecture['lecture_info']) > 0:
