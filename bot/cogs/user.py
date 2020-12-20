@@ -18,8 +18,8 @@ class User(_Cog, name="user"):
     async def user(self, context):
         try:
             guild = self.client.get_guild(int(config.server_id))
-            users = [guild.get_member(int(c)) for c in context.message.content.split() if c.isnumeric()]
-            embeds = [await get_user(context, user) for user in set(context.message.mentions + users) if user is not None]
+            users = [ guild.get_member(int(c)) for c in context.message.content.split() if c.isnumeric() ]
+            embeds = [ await get_user(context, user) for user in set(context.message.mentions + users) if user is not None ]
             
             if not len(embeds):
                 raise DataNotFoundError()
