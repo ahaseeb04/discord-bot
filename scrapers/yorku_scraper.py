@@ -19,10 +19,9 @@ def scrape_course_list(course):
         prefix = "https://w2prod.sis.yorku.ca/Apps/WebObjects/cdm.woa/wa/crsq1?"
         suffix = '&'.join(_build_link(faculty, **course))
         URL = ''.join((prefix, suffix))
-
         page = requests.get(URL)
-
         soup = bs4.BeautifulSoup(page.content, 'html.parser')
+
         try:
             rows = soup.find_all('table')[6].find_all('tr', recursive=False)
         except:
@@ -50,7 +49,7 @@ def scrape_course(course):
         def _scrape_lecture_info(soup):
             lecture_info = { label : row.text for label, row in zip(labels, soup) }
             if columns[4].find(string= lambda t: "backup" in t.lower()) is not None:
-                lecture_info['Backup'] = 'backup'
+                lecture_info['backup'] = 'backup'
             return lecture_info
 
         columns = soup.find_all('td', recursive=False)
@@ -62,7 +61,7 @@ def scrape_course(course):
 
     def _scrape_section(soup):
         rows = soup.find_all('tr')[2].table
-        labels = [ r.text for r in rows.td.next_sibling.find_all('b') ]
+        labels = [r.text.lower() for r in rows.td.next_sibling.find_all('b')]
 
         return {
             'section_info': ' '.join(soup.tr.stripped_strings),
