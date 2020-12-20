@@ -37,7 +37,7 @@ def scrape_course_list(course):
             yield from _scrape_faculty(faculty)
     else:
         yield from _scrape_faculty(faculty)
-    
+
 def scrape_course(course):
     def _scrape_heading(soup):
         return soup.find(class_="heading").text
@@ -54,9 +54,9 @@ def scrape_course(course):
 
         columns = soup.find_all('td', recursive=False)
         if columns[2].text != 'Cancelled':
-            return ( columns[0].text, {
+            return (columns[0].text, {
                 'instructors': ', '.join(instructor.text for instructor in columns[3].find_all('a')),
-                'lecture_info': [_scrape_lecture_info(row) for row in columns[1].find_all('tr')]
+                'lecture_info': [ _scrape_lecture_info(row) for row in columns[1].find_all('tr') ]
             })
 
     def _scrape_section(soup):
@@ -67,7 +67,7 @@ def scrape_course(course):
             'section_info': ' '.join(soup.tr.stripped_strings),
             'lectures': dict(lecture for row in islice(rows, 1, None) if (lecture := _scrape_lecture(row, labels)) is not None)
         }
-        
+
     for URL in scrape_course_list(course):
         if URL[0].split()[1].startswith(course['course']):
             page = requests.get(URL[2])
@@ -80,13 +80,3 @@ def scrape_course(course):
                 'sections': [_scrape_section(section) for section in sections],
                 'url': URL[2]
             }
-
-if __name__ == "__main__":
-    import re
-
-    course = 'eecs 3101'
-    info = re.match("".join((
-        "(?:(?P<faculty>[a-z]{2})\s)?(?:(?P<department>[a-z]{2,4})\s?"
-        "(?P<course>[0-9]{4}))+"
-        "(?:\s(?P<session>[a-z]{2})\s?(?P<year>[0-9]{4}))?"
-    )), course.lower())

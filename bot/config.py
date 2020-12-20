@@ -1,38 +1,23 @@
-import os
+from os import getenv as env
 from dotenv import load_dotenv
 
 load_dotenv()
 
-token = os.getenv('TOKEN')
-bot_id = os.getenv('BOT_ID')
-server_id = os.getenv('SERVER_ID')
+def __getattr__(key):
+    return env(key.upper())
 
-welcome_channel = os.getenv('WELCOME_CHANNEL')
-verification_channel = os.getenv('VERIFICATION_CHANNEL')
-verification_logs_channel = os.getenv('VERIFICATION_LOGS_CHANNEL')
-verification_rules_channel = os.getenv('VERIFICATION_RULES_CHANNEL')
-
-cs_channel = os.getenv('CS_CHANNEL')
-gaming_channel = os.getenv('GAMING_CHANNEL')
-engineering_channel = os.getenv('ENGINEERING_CHANNEL')
-
-verified_role = os.getenv('VERIFIED_ROLE')
-
-postgres_url = os.getenv('DATABASE_URL')
+postgres_url = env('DATABASE_URL')
 postgres_params = {
-    'drivername': os.getenv('POSTGRES_DRIVER'),
-    'username': os.getenv('POSTGRES_USER'),
-    'password': os.getenv('POSTGRES_PASSWORD'),
-    'host': os.getenv('HOST', default='0.0.0.0'),
-    'database': os.getenv('POSTGRES_NAME'),
-    'port': os.getenv('POSTGRES_PORT', default='5432')
+    'drivername': env('POSTGRES_DRIVER'),
+    'username': env('POSTGRES_USER'),
+    'password': env('POSTGRES_PASSWORD'),
+    'host': env('HOST', default='0.0.0.0'),
+    'database': env('POSTGRES_NAME'),
+    'port': env('POSTGRES_PORT', default='5432')
 }
 
-redis_url = os.getenv('REDIS_URL')
+redis_url = env('REDIS_URL')
 redis_params = {
-    'host': os.getenv('HOST', default='0.0.0.0'),
-    'port': os.getenv('REDIS_PORT', default='6379')
+    'host': env('HOST', default='0.0.0.0'),
+    'port': env('REDIS_PORT', default='6379')
 }
-
-stfuuuuu_aunk = os.getenv('STFUUUUU_AUNK')
-deverify_days = os.getenv('DEVERIFY_DAYS')
