@@ -7,7 +7,7 @@ from bot import config
 from bot.cogs._cog import _Cog
 
 if __name__ == "__main__":
-    client = commands.Bot(command_prefix=';', intents=Intents.all())
+    client = commands.Bot(command_prefix='?', intents=Intents.all())
 
     for cog in _Cog.__subclasses__():
         print(cog)
