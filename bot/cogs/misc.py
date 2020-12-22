@@ -19,7 +19,7 @@ class CronJobs(_Cog):
             await self.daily_reminder(config.cs_channel, "Daily reminder JS is ass")
 
         @aiocron.crontab('0 19 * * *', tz=tz)
-        async def js():
+        async def angular():
             await self.daily_reminder(config.cs_channel, "Daily reminder Angular is ass")
 
         @aiocron.crontab('0 10 * * *', tz=tz)
