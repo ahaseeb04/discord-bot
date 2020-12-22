@@ -13,10 +13,14 @@ class CronJobs(_Cog):
     def __init__(self, client):
         _Cog.__init__(self, client)
         tz = timezone('US/Eastern')
-        
+
+        @aiocron.crontab('0 10 * * *', tz=tz)
+        async def js():
+            await self.daily_reminder(config.cs_channel, "Daily reminder JS is ass")
+
         @aiocron.crontab('0 19 * * *', tz=tz)
         async def js():
-            await self.daily_reminder(config.cs_channel, "Daily reminder JS is ass and Angular is the worst framework")
+            await self.daily_reminder(config.cs_channel, "Daily reminder Angular is ass")
 
         @aiocron.crontab('0 10 * * *', tz=tz)
         async def hey():
