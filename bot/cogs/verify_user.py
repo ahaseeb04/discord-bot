@@ -96,7 +96,7 @@ class VerifyUser(_Cog, name='verify'):
             greetings = [
                 f'It is good to have you here! You are now verified and please make sure to read the {rules.mention}!',
                 f'You are now verified. Enjoy your stay and please make sure to read the {rules.mention}!',
-                f'A warm welcome to the server! You are now verified, make yourself comfortable, and read the {rules.mention} if you already haven\'t!',
+                f'A warm welcome to the server! You are now verified, make yourself comfortable, and read the {rules.mention} if you haven\'t already!',
             ]
 
             welcome = self.client.get_channel(int(config.welcome_channel))
