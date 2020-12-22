@@ -16,7 +16,7 @@ class CronJobs(_Cog):
         
         @aiocron.crontab('0 10 * * *', tz=tz)
         async def js():
-            await self.daily_reminder(config.cs_channel, "Daily reminder js is ass")
+            await self.daily_reminder(config.cs_channel, "Daily reminder JS is ass and Angular is the worst framework")
 
         @aiocron.crontab('0 10 * * *', tz=tz)
         async def hey():
