@@ -31,7 +31,7 @@ class VerifyUser(_Cog, name='verify'):
 
             return check
 
-        def get_requested_roles(requested_roles):
+        def get_requested_roles(requested_roles, roles):
             for requested_role in requested_roles:
                 requested = max(((ratio, role) for role in roles if (ratio := fuzz.token_sort_ratio(role, requested_role)) > 70), default=None)
 
@@ -62,7 +62,7 @@ class VerifyUser(_Cog, name='verify'):
 
             roles = { **roles, **aliases }
 
-            requested_roles = list(get_requested_roles(requested_roles))
+            requested_roles = list(get_requested_roles(requested_roles, roles))
 
             user_embed = await get_user(context, context.message.author)
             user_embed.add_field(name='Requested roles', value=context.message.content, inline=False)
