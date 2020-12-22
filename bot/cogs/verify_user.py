@@ -1,3 +1,4 @@
+import random
 import asyncio
 from datetime import date, datetime
 
@@ -91,8 +92,15 @@ class VerifyUser(_Cog, name='verify'):
             await member.add_roles(*requested_roles)
             await logs.send(f'{member.mention} has been verified by {user.display_name}.')
 
+            rules = self.client.get_channel(int(config.rules_channel))
+            greetings = [
+                f'It is good to have you here! You are now verified and please make sure to read the {rules.mention}!',
+                f'You are now verified. Enjoy your stay and please make sure to read the {rules.mention}!',
+                f'A warm welcome to the server! You are now verified, make yourself comfortable, and read the {rules.mention} if you already haven\'t.',
+            ]
+
             welcome = self.client.get_channel(int(config.welcome_channel))
-            await welcome.send(f'{member.mention} Welcome to the server! You have been verified.')
+            await welcome.send(f'{member.mention} {random.choice(greetings)}')
 
             df = sql_to_df('last_message', eng, 'user_id')
             df.at[str(member.id), 'verified'] = date.today().isoformat()
