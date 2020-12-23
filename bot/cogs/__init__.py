@@ -7,4 +7,3 @@ from .misc import CronJobs, StfuuuuuAunk
 from .main import Main
 from .aliases import Aliases
 from .last_message import LastMessage
-from .nuke import Nuke
