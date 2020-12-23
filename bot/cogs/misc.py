@@ -26,10 +26,6 @@ class CronJobs(_Cog):
         async def hey():
             await self.daily_reminder(config.engineering_channel, "Hey")
 
-        @aiocron.crontab('0 19 * * *', tz=tz)
-        async def destiny():
-            await self.daily_reminder(config.gaming_channel, "Daily reminder Destiny is ass")
-
     async def daily_reminder(self, channel, message):
         await self.client.get_channel(int(channel)).send(message)
 
@@ -46,9 +42,3 @@ class StfuuuuuAunk(_Cog):
         if author is not None and any(str(role.id) == config.stfuuuuu_aunk for role in author.roles) and fire(message.content):
             role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
             await message.channel.send(role.mention)
-
-class DestinySucks(_Cog):
-    @_Cog.listener(name='on_message')
-    async def destiny_sucks(self, message):
-        if 'destiny' in message.content.lower() and randint(1, 4) == 2 and message.author.id != int(config.bot_id):
-            await message.channel.send('Destiny is ass')
