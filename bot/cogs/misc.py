@@ -18,10 +18,6 @@ class CronJobs(_Cog):
         async def js():
             await self.daily_reminder(config.cs_channel, "Daily reminder JS is ass")
 
-        @aiocron.crontab('0 19 * * *', tz=tz)
-        async def angular():
-            await self.daily_reminder(config.cs_channel, "Daily reminder Angular is ass and Vue is the best JS framework")
-
         @aiocron.crontab('0 10 * * *', tz=tz)
         async def hey():
             await self.daily_reminder(config.engineering_channel, "Hey")
