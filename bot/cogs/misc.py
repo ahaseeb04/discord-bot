@@ -20,7 +20,7 @@ class CronJobs(_Cog):
 
         @aiocron.crontab('0 19 * * *', tz=tz)
         async def angular():
-            await self.daily_reminder(config.cs_channel, "Daily reminder Angular is ass")
+            await self.daily_reminder(config.cs_channel, "Daily reminder Angular is ass and Vue is the best JS framework")
 
         @aiocron.crontab('0 10 * * *', tz=tz)
         async def hey():
