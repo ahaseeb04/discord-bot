@@ -15,8 +15,6 @@ class Main(_Cog):
         pr = self.client.command_prefix
         if context.message.channel.id == int(config.verification_channel) and context.message.content.lower().startswith(f'{pr}verify{pr}'):
             await VerifyUser.verify(self, context)
-        elif context.message.content == ';-;':
-            pass
         elif isinstance(error, commands.CommandNotFound):
             pass
         elif isinstance(error, commands.MissingPermissions):
