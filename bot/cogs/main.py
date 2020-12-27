@@ -18,7 +18,7 @@ class Main(_Cog):
         elif context.message.content == ';-;':
             pass
         elif isinstance(error, commands.CommandNotFound):
-            await context.message.channel.send(error)
+            pass
         elif isinstance(error, commands.MissingPermissions):
             err = context.message.content.split()[0].strip(pr)
             await context.message.channel.send(f'Command "{err}" is not found')
