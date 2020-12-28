@@ -1,11 +1,11 @@
-import datetime as dt
 import asyncio
+import datetime as dt
 from pytz import timezone
 
-from discord.ext import commands
-from disputils import BotEmbedPaginator
 import discord
 import pandas as pd
+from discord.ext import commands
+from disputils import BotEmbedPaginator
 
 from ._cog import _Cog
 from bot import config
@@ -13,17 +13,17 @@ from bot.exceptions import DataNotFoundError
 from database_tools import engine, sql_to_df, redis_access
 
 
-class User(_Cog, name="user"):
+class User(_Cog, name='user'):
     @commands.command(brief='Fetch details for a spcified user.', aliases=['member', 'u', 'whois'])
     async def user(self, context):
         try:
             guild = self.client.get_guild(int(config.server_id))
             users = [ guild.get_member(int(c)) for c in context.message.content.split() if c.isnumeric() ]
             embeds = [ await get_user(context, user) for user in set(context.message.mentions + users) if user is not None ]
-            
+
             if not len(embeds):
                 raise DataNotFoundError()
-            
+
         except DataNotFoundError:
             await context.message.channel.send('**Error**: Sorry, please specify a valid user.')
         else:
@@ -32,6 +32,17 @@ class User(_Cog, name="user"):
     @commands.command(brief='Fetch details about yourself.')
     async def me(self, context):
         await context.message.channel.send(embed=await get_user(context, context.message.author))
+
+    @commands.command(brief='Fetch a user\'s avatar.', aliases=['av'])
+    async def avatar(self, context):
+        guild = self.client.get_guild(int(config.server_id))
+        users = [ guild.get_member(int(c)) for c in context.message.content.split() if c.isnumeric() ]
+        embeds = [ await get_avatar_embed(context, user) for user in set(context.message.mentions + users) if user is not None ]
+
+        if not len(embeds):
+            await context.message.channel.send(embed=await get_avatar_embed(context, context.message.author))
+        else:
+            await BotEmbedPaginator(context, embeds).run()
 
 
 async def get_user(context, user):
@@ -63,3 +74,10 @@ async def get_user(context, user):
 
     return embed
 
+async def get_avatar_embed(context, user):
+    embed = discord.Embed(color=user.color)
+
+    embed.set_author(name=user, icon_url=user.avatar_url)
+    embed.set_image(url=user.avatar_url)
+
+    return embed
