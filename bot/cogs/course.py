@@ -46,6 +46,9 @@ class Course(_Cog, name="course"):
                 for lecture in lectures:
                     yield ' '.join(_format_lecture(lecture))
 
+            def _format_catalogue(catalogue):
+                return f"Cat #: {''.join(catalogue)}" if catalogue else ''
+
             def _format_lecture(lecture):
                 def _format_day(day):
                     return dict(csv.reader(open('bot/support/days.csv', 'r'))).get(day, '')
@@ -78,13 +81,15 @@ class Course(_Cog, name="course"):
                 if len(lecture['lecture_info']) > 0:
                     yield (
                         f"{name}: {lecture['instructors'] or 'Not Available'}",
-                        '\n'.join(_format_lectures(lecture['lecture_info'])),
+                        '\n'.join((
+                            _format_catalogue(lecture['catalogue_numbers']),
+                            '\n'.join(_format_lectures(lecture['lecture_info']))
+                        ))
                     )
 
-                    yield (
-                        f'Catalogue Numbers:',
-                        '\n'.join({lecture['catalogue_numbers']})
-                    )
+                # if len(lecture['catalogue_numbers']):
+                #     yield f"**Cat #:**{''.join(lecture['catalogue_numbers'])}"
+                    
 
         course = ' '.join(context.message.content.split()[1:])
         info = re.match(course_regex, course.lower())
