@@ -35,7 +35,7 @@ class Course(_Cog, name="course"):
             if len(embeds.get_fields()) == 0:
                 tmp = EmbedBuilder()
                 tmp.add_field(
-                    name="No Sections Found", 
+                    name="No Sections Found",
                     value="**This course listing may be a duplicate. There may be other listings with valid sections.*"
                 )
                 embeds.insert_embed(tmp)
@@ -81,6 +81,11 @@ class Course(_Cog, name="course"):
                         '\n'.join(_format_lectures(lecture['lecture_info'])),
                     )
 
+                    yield (
+                        f'Catalogue Numbers:',
+                        '\n'.join({lecture['catalogue_numbers']})
+                    )
+
         course = ' '.join(context.message.content.split()[1:])
         info = re.match(course_regex, course.lower())
 
@@ -89,7 +94,7 @@ class Course(_Cog, name="course"):
                 raise IllegalFormatError()
 
             courses = scrape_course(info.groupdict())
-            embeds = [embed for course_info in courses for embed in _format_course(course_info)]
+            embeds = [ embed for course_info in courses for embed in _format_course(course_info) ]
 
             if not len(embeds):
                 raise DataNotFoundError()
