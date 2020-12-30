@@ -55,7 +55,6 @@ def scrape_course(course):
         columns = soup.find_all('td', recursive=False)
 
         if columns[2].text != 'Cancelled':
-            # print('\n'.join(columns[2].stripped_strings))
             return (columns[0].text, {
                 'instructors': ', '.join(instructor.text for instructor in columns[3].find_all('a')),
                 'catalogue_numbers': ' '.join(columns[2].stripped_strings),

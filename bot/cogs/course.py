@@ -87,9 +87,6 @@ class Course(_Cog, name="course"):
                         ))
                     )
 
-                # if len(lecture['catalogue_numbers']):
-                #     yield f"**Cat #:**{''.join(lecture['catalogue_numbers'])}"
-                    
 
         course = ' '.join(context.message.content.split()[1:])
         info = re.match(course_regex, course.lower())
