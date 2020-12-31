@@ -1,4 +1,6 @@
 import asyncio
+import threading
+import time
 from datetime import date, datetime
 
 from fuzzywuzzy import fuzz
@@ -39,6 +41,11 @@ class VerifyUser(_Cog, name='verify'):
 
                 if requested is not None and (role := roles.get(requested[1])) is not None:
                     yield get(context.message.author.guild.roles, name=role)
+        
+        def update_db():
+            df = sql_to_df('last_message', eng, 'user_id')
+            df.at[str(member.id), 'verified'] = date.today().isoformat()
+            df_to_sql(df, 'last_message', eng)
 
         try:
             user_embed = None
@@ -94,9 +101,12 @@ class VerifyUser(_Cog, name='verify'):
             welcome = self.client.get_channel(int(config.welcome_channel))
             await welcome.send(f'{member.mention} Welcome to the server! You have been verified.')
 
-            df = sql_to_df('last_message', eng, 'user_id')
-            df.at[str(member.id), 'verified'] = date.today().isoformat()
-            df_to_sql(df, 'last_message', eng)
+            # df = sql_to_df('last_message', eng, 'user_id')
+            # df.at[str(member.id), 'verified'] = date.today().isoformat()
+            # df_to_sql(df, 'last_message', eng)
+            # await update_db()
+            threading.Thread(target=update_db).start()
+
         finally:
             if user_embed is not None:
                 await user_embed.clear_reactions()
