@@ -108,6 +108,3 @@ class LastMessage(_Cog):
     #     data = self.redis.hgetall("users")
     #     df = pd.DataFrame.from_dict(data, orient='index', columns=['last_message']).rename_axis('user_id')
     #     await context.channel.send(f"```\n{tabulate(df, headers='keys', tablefmt='psql')}```")
-
-
-    
