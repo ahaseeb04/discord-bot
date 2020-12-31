@@ -1,7 +1,6 @@
 import random
 import asyncio
 import threading
-import time
 from datetime import date, datetime
 
 from fuzzywuzzy import fuzz
@@ -109,10 +108,6 @@ class VerifyUser(_Cog, name='verify'):
             welcome = self.client.get_channel(int(config.welcome_channel))
             await welcome.send(f'{member.mention} {random.choice(greetings)}')
 
-            # df = sql_to_df('last_message', eng, 'user_id')
-            # df.at[str(member.id), 'verified'] = date.today().isoformat()
-            # df_to_sql(df, 'last_message', eng)
-            # await update_db()
             threading.Thread(target=update_db).start()
 
         finally:
