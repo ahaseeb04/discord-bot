@@ -113,3 +113,4 @@ class VerifyUser(_Cog, name='verify'):
         finally:
             if user_embed is not None:
                 await user_embed.clear_reactions()
+                
