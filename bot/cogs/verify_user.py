@@ -42,7 +42,7 @@ class VerifyUser(_Cog, name='verify'):
                 if requested is not None and (role := roles.get(requested[1])) is not None:
                     yield get(context.message.author.guild.roles, name=role)
         
-        def update_db():
+        def update_db(eng, member):
             df = sql_to_df('last_message', eng, 'user_id')
             df.at[str(member.id), 'verified'] = date.today().isoformat()
             df_to_sql(df, 'last_message', eng)
@@ -108,7 +108,7 @@ class VerifyUser(_Cog, name='verify'):
             welcome = self.client.get_channel(int(config.welcome_channel))
             await welcome.send(f'{member.mention} {random.choice(greetings)}')
 
-            threading.Thread(target=update_db).start()
+            threading.Thread(target=update_db, args=[eng, member]).start()
 
         finally:
             if user_embed is not None:
