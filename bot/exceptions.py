@@ -1,8 +1,9 @@
 import abc
 
 class CustomError(abc.ABC, Exception):
-    def __init__(self, user=None):
+    def __init__(self, user=None, message=None):
         self.user = user
+        self.message = message
 
 class IllegalFormatError(CustomError):
     pass

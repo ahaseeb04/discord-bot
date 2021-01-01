@@ -11,11 +11,11 @@ from ._cog import _Cog
 from .user import get_user
 from bot import config
 from database_tools import df_to_dict, sql_to_df, dict_to_df, df_to_sql, engine
-from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError, ShouldBeBannedError
+from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError, ShouldBeBannedError, DataNotFoundError
 
 class VerifyUser(_Cog, name='verify'):
     @commands.command(brief='Request roles for yourself.', hidden=True)
-    async def verify(self, context):
+    async def verify(self, context, **kwargs):
         def check_reaction(message):
             def check(reaction, user):
                 is_correct_reaction = lambda emoji: reaction.message.id == message.id and reaction.emoji == emoji
@@ -24,11 +24,13 @@ class VerifyUser(_Cog, name='verify'):
                 if is_correct_reaction('👍') and not is_bot(user):
                     return True
                 if is_correct_reaction('👎') and not is_bot(user):
-                    raise IllegalFormatError(user)
+                    raise IllegalFormatError(user=user)
                 if is_correct_reaction('🥾') and not is_bot(user):
-                    raise NotApprovedError(user)
+                    raise NotApprovedError(user=user)
                 if is_correct_reaction('🔨') and not is_bot(user):
-                    raise ShouldBeBannedError(user)
+                    raise ShouldBeBannedError(user=user)
+                if is_correct_reaction('🔁') and not is_bot(user):
+                    raise DataNotFoundError(message=message, user=user)
 
             return check
 
@@ -60,7 +62,8 @@ class VerifyUser(_Cog, name='verify'):
                 bot = context.message.guild.get_member(int(config.bot_id))
                 raise IllegalFormatError(bot)
 
-            await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
+            if not kwargs.get('refresh'):
+                await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
 
             eng = engine(url=config.postgres_url, params=config.postgres_params)
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
@@ -76,7 +79,7 @@ class VerifyUser(_Cog, name='verify'):
 
             user_embed = await logs.send(embed=user_embed)
 
-            for reaction in ['👍', '👎', '🥾', '🔨']:
+            for reaction in ['👍', '👎', '🥾', '🔨', '🔁']:
                 await user_embed.add_reaction(emoji=reaction)
 
             reaction, user = await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
@@ -92,6 +95,10 @@ class VerifyUser(_Cog, name='verify'):
         except ShouldBeBannedError as e:
             await context.message.author.ban()
             await logs.send(f'{context.message.author.mention} has been banned by {e.user.display_name}.')
+        except DataNotFoundError as e:
+            await e.message.delete()
+            await logs.send(f'New verification for {context.message.author.mention} has been requested by {e.user.display_name}.')
+            await VerifyUser.verify(self, context, refresh=True)
         except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)
         else:
