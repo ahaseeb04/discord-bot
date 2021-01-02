@@ -58,5 +58,6 @@ def scrape_rmp(professor_name):
         }
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [executor.submit(_scrape_rmp, professor) for professor in get_professors(professor_name)]
-        yield from [f.result() for f in futures]
+        futures = [ executor.submit(_scrape_rmp, professor) for professor in get_professors(professor_name) ]
+        
+        yield from [ f.result() for f in futures ]
