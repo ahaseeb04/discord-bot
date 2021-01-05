@@ -14,7 +14,7 @@ from database_tools import df_to_dict, sql_to_df, dict_to_df, df_to_sql, engine
 from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError, ShouldBeBannedError, DataNotFoundError
 
 class VerifyUser(_Cog, name='verify'):
-    @commands.command(brief='Request roles for yourself.', hidden=True)
+    @commands.command(brief='Request roles for yourself.', hidden=True, aliases=['Verify'])
     async def verify(self, context, **kwargs):
         def check_reaction(message):
             def check(reaction, user):
@@ -58,7 +58,7 @@ class VerifyUser(_Cog, name='verify'):
                 raise WrongChannelError()
 
             requested_roles = [ item.strip() for item in context.message.content.split(self.client.command_prefix) if item ]
-            if len(requested_roles) == 1 and len(context.message.content.split()) > 1:
+            if len(requested_roles) == 1:
                 bot = context.message.guild.get_member(int(config.bot_id))
                 raise IllegalFormatError(bot)
 
