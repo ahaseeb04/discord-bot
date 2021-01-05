@@ -5,7 +5,7 @@ import requests
 def get_professors(professor_name, offset=0, searching=True):
     while searching:
         url = ''.join((
-            'https://www.ratemyprofessors.com/search.jsp?'
+            'https://www.ratemyprofessors.com/search.jsp?',
             'queryBy=teacherName',
             '&schoolName=york+university', 
             f'&query={"+".join(professor_name)}', 
