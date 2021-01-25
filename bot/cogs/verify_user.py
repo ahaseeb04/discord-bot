@@ -58,12 +58,14 @@ class VerifyUser(_Cog, name='verify'):
                 raise WrongChannelError()
 
             requested_roles = [ item.strip() for item in context.message.content.split(self.client.command_prefix) if item ]
+
+            msg = await context.channel.history(limit=5).find(lambda m: m.id == context.message.id)
+            if msg is not None:
+                await msg.delete()
+
             if len(requested_roles) == 1:
                 bot = context.message.guild.get_member(int(config.bot_id))
                 raise IllegalFormatError(bot)
-
-            if not kwargs.get('refresh'):
-                await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
 
             eng = engine(url=config.postgres_url, params=config.postgres_params)
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
@@ -71,7 +73,14 @@ class VerifyUser(_Cog, name='verify'):
 
             roles = { **roles, **aliases }
 
-            requested_roles = list(get_requested_roles(requested_roles, roles))
+            requested_roles = (get_requested_roles(requested_roles, roles))
+
+            if config.verified_role not in map(lambda r: str(r.id), requested_roles):
+                bot = context.message.guild.get_member(int(config.bot_id))
+                raise IllegalFormatError(bot)
+
+            if not kwargs.get('refresh'):
+                await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
 
             user_embed = await get_user(context, context.message.author)
             user_embed.add_field(name='Requested roles', value=context.message.content, inline=False)
@@ -91,7 +100,7 @@ class VerifyUser(_Cog, name='verify'):
             await context.message.author.kick()
             await logs.send(f'{context.message.author.mention} has been kicked by {e.user.display_name}.')
         except WrongChannelError:
-            await context.message.channel.send(f'Command "verify" is not found')
+            pass
         except ShouldBeBannedError as e:
             await context.message.author.ban()
             await logs.send(f'{context.message.author.mention} has been banned by {e.user.display_name}.')

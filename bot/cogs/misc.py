@@ -22,8 +22,15 @@ class CronJobs(_Cog):
         async def hey():
             await self.daily_reminder(config.engineering_channel, "Hey")
 
+        @aiocron.crontab('0 1 * * 2', tz=tz)
+        async def purge_roles():
+            for role in self.client.get_guild(int(config.server_id)).roles:
+                if not len(role.members):
+                    await role.delete()
+
     async def daily_reminder(self, channel, message):
         await self.client.get_channel(int(channel)).send(message)
+
 
 
 class StfuuuuuAunk(_Cog):
@@ -37,4 +44,17 @@ class StfuuuuuAunk(_Cog):
         author = guild.get_member(message.author.id)
         if author is not None and any(str(role.id) == config.stfuuuuu_aunk for role in author.roles) and fire(message.content):
             role = get(message.guild.roles, id=int(config.stfuuuuu_aunk))
+            await message.channel.send(role.mention)
+
+class StfuuuuuEmily(_Cog):
+    @_Cog.listener(name='on_message')
+    async def stfuuuuu_emily(self, message):
+        def fire(msg):
+            chance = msg.lower() == 'i-' or math.ceil(50**2 / (sum(1 for c in msg if c.isupper() or c in set("@_!#$%^&*?"))**2 or 1))
+            return not (chance and randrange(chance))
+
+        guild = self.client.get_guild(int(config.server_id))
+        author = guild.get_member(message.author.id)
+        if author is not None and any(str(role.id) == config.stfuuuuu_emily for role in author.roles) and fire(message.content):
+            role = get(message.guild.roles, id=int(config.stfuuuuu_emily))
             await message.channel.send(role.mention)
