@@ -11,7 +11,7 @@ from ._cog import _Cog
 from .user import get_user
 from bot import config
 from database_tools import df_to_dict, sql_to_df, dict_to_df, df_to_sql, engine
-from bot.exceptions import IllegalFormatError, NotApprovedError, WrongChannelError, ShouldBeBannedError, DataNotFoundError
+from bot.exceptions import IllegalFormatError, NotApprovedError, ShouldBeBannedError, DataNotFoundError
 
 class VerifyUser(_Cog, name='verify'):
     @commands.command(brief='Request roles for yourself.', hidden=True, aliases=['Verify'])
@@ -53,9 +53,6 @@ class VerifyUser(_Cog, name='verify'):
             user_embed = None
             member = context.message.author
             logs = self.client.get_channel(int(config.verification_logs_channel))
-
-            # if context.message.channel.id != int(config.verification_channel):
-            #     raise WrongChannelError()
 
             requested_roles = [ item.strip() for item in context.message.content.split(self.client.command_prefix) if item ]
 
@@ -99,8 +96,6 @@ class VerifyUser(_Cog, name='verify'):
         except NotApprovedError as e:
             await context.message.author.kick()
             await logs.send(f'{context.message.author.mention} has been kicked by {e.user.display_name}.')
-        except WrongChannelError:
-            await context.message.channel.send(f'Command "verify" is not found')
         except ShouldBeBannedError as e:
             await context.message.author.ban()
             await logs.send(f'{context.message.author.mention} has been banned by {e.user.display_name}.')
