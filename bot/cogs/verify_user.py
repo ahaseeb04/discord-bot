@@ -73,7 +73,7 @@ class VerifyUser(_Cog, name='verify'):
 
             roles = { **roles, **aliases }
 
-            requested_roles = (get_requested_roles(requested_roles, roles))
+            requested_roles = set(get_requested_roles(requested_roles, roles))
 
             if config.verified_role not in map(lambda r: str(r.id), requested_roles):
                 bot = context.message.guild.get_member(int(config.bot_id))
