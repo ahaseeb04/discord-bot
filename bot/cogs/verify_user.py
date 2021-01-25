@@ -103,7 +103,7 @@ class VerifyUser(_Cog, name='verify'):
             await logs.send(f'{context.message.author.mention} has been banned by {e.user.display_name}.')
         except DataNotFoundError as e:
             await e.message.delete()
-            await logs.send(f'New verification for {context.message.author.mention} has been requested by {e.user.display_name}.')
+            await logs.send(f'New verification embed for {context.message.author.mention} has been requested by {e.user.display_name}.')
             await VerifyUser.verify(self, context, refresh=True)
         except (asyncio.TimeoutError, asyncio.exceptions.CancelledError) as e:
             print(e)

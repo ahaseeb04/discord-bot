@@ -37,5 +37,5 @@ class RMP(_Cog, name='rmp'):
         except DataNotFoundError:
             await context.message.channel.send('**Error**: Sorry, could not find professor!')
         else:
-            embeds = [_build_embed(professor) for professor in professors]
+            embeds = [ _build_embed(professor) for professor in professors ]
             await BotEmbedPaginator(context, embeds).run()

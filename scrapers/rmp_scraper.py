@@ -5,7 +5,7 @@ import requests
 def get_professors(professor_name, offset=0, searching=True):
     while searching:
         url = ''.join((
-            'https://www.ratemyprofessors.com/search.jsp?'
+            'https://www.ratemyprofessors.com/search.jsp?',
             'queryBy=teacherName',
             '&schoolName=york+university', 
             f'&query={"+".join(professor_name)}', 
@@ -58,5 +58,6 @@ def scrape_rmp(professor_name):
         }
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [executor.submit(_scrape_rmp, professor) for professor in get_professors(professor_name)]
-        yield from [f.result() for f in futures]
+        futures = [ executor.submit(_scrape_rmp, professor) for professor in get_professors(professor_name) ]
+        
+        yield from [ f.result() for f in futures ]

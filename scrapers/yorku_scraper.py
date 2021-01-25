@@ -18,8 +18,8 @@ def scrape_course_list(course):
 
         prefix = "https://w2prod.sis.yorku.ca/Apps/WebObjects/cdm.woa/wa/crsq1?"
         suffix = '&'.join(_build_link(faculty, **course))
-        URL = ''.join((prefix, suffix))
-        page = requests.get(URL)
+        url = ''.join((prefix, suffix))
+        page = requests.get(url)
         soup = bs4.BeautifulSoup(page.content, 'html.parser')
 
         try:
@@ -53,24 +53,26 @@ def scrape_course(course):
             return lecture_info
 
         columns = soup.find_all('td', recursive=False)
+
         if columns[2].text != 'Cancelled':
             return (columns[0].text, {
                 'instructors': ', '.join(instructor.text for instructor in columns[3].find_all('a')),
-                'lecture_info': [ _scrape_lecture_info(row) for row in columns[1].find_all('tr') ]
+                'catalogue_numbers': ' '.join(columns[2].stripped_strings),
+                'lecture_info': [ _scrape_lecture_info(row) for row in columns[1].find_all('tr') ],
             })
 
     def _scrape_section(soup):
         rows = soup.find_all('tr')[2].table
-        labels = [r.text.lower() for r in rows.td.next_sibling.find_all('b')]
+        labels = [ r.text.lower() for r in rows.td.next_sibling.find_all('b') ]
 
         return {
             'section_info': ' '.join(soup.tr.stripped_strings),
             'lectures': dict(lecture for row in islice(rows, 1, None) if (lecture := _scrape_lecture(row, labels)) is not None)
         }
 
-    for URL in scrape_course_list(course):
-        if URL[0].split()[1].startswith(course['course']):
-            page = requests.get(URL[2])
+    for urls in scrape_course_list(course):
+        if urls[0].split()[1].startswith(course['course']):
+            page = requests.get(urls[2])
             soup = bs4.BeautifulSoup(page.content, 'html.parser')
 
             sections = filter(lambda s: isinstance(s, bs4.element.Tag), soup.find_all('table')[6])
@@ -78,5 +80,5 @@ def scrape_course(course):
                 'heading': _scrape_heading(soup),
                 'description': _scrape_description(soup),
                 'sections': [_scrape_section(section) for section in sections],
-                'url': URL[2]
+                'url': urls[2]
             }
