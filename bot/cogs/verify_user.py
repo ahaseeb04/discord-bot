@@ -54,10 +54,18 @@ class VerifyUser(_Cog, name='verify'):
             member = context.message.author
             logs = self.client.get_channel(int(config.verification_logs_channel))
 
-            if context.message.channel.id != int(config.verification_channel):
-                raise WrongChannelError()
+            # if context.message.channel.id != int(config.verification_channel):
+            #     raise WrongChannelError()
 
             requested_roles = [ item.strip() for item in context.message.content.split(self.client.command_prefix) if item ]
+
+            msg = await context.channel.history(limit=5).find(lambda m: m.id == context.message.id)
+            if msg is not None:
+                await msg.delete()
+
+            if len(requested_roles) == 1:
+                bot = context.message.guild.get_member(int(config.bot_id))
+                raise IllegalFormatError(bot)
 
             eng = engine(url=config.postgres_url, params=config.postgres_params)
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
@@ -65,14 +73,9 @@ class VerifyUser(_Cog, name='verify'):
 
             roles = { **roles, **aliases }
 
-            requested_roles = list(get_requested_roles(requested_roles, roles))
+            requested_roles = set(get_requested_roles(requested_roles, roles))
 
-            msg = await context.channel.history(limit=5).find(lambda m: m.id == context.message.id)
-            if msg is not None:
-                await msg.delete()
-
-            # print(config.verified_role in map(lambda r: str(r.id), requested_roles))
-            if len(requested_roles) == 1 or config.verified_role not in map(lambda r: str(r.id), requested_roles):
+            if config.verified_role not in map(lambda r: str(r.id), requested_roles):
                 bot = context.message.guild.get_member(int(config.bot_id))
                 raise IllegalFormatError(bot)
 
