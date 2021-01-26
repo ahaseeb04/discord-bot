@@ -50,7 +50,7 @@ class StfuuuuuEmily(_Cog):
     @_Cog.listener(name='on_message')
     async def stfuuuuu_emily(self, message):
         def fire(msg):
-            chance = msg.lower() == 'i-' or math.ceil(50**2 / (sum(1 for c in msg if c.isupper() or c in set("@_!#$%^&*?"))**2 or 1))
+            chance = msg.lower() == 'i-' or math.ceil(50 / (sum(1 for c in msg if c.isupper() or c in set("@_!#$%^&*?")) or 1))
             return not (chance and randrange(chance))
 
         guild = self.client.get_guild(int(config.server_id))
