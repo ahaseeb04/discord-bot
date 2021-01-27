@@ -1,5 +1,4 @@
 import math
-import inspect
 from pytz import timezone
 from random import randrange, randint
 
@@ -38,9 +37,8 @@ class Brady(_Cog):
     @commands.command(brief="Post as Brady.")
     async def brady(self, context, **kwargs):
         await context.message.delete()
-        msg = context.message.content.replace(f'{self.client.command_prefix}{inspect.stack()[0].function}', '', 1)
+        msg = context.message.content.replace(f'{context.prefix}{context.command}', '', 1)
         await context.channel.send(msg)
-
 
 class StfuuuuuAunk(_Cog):
     @_Cog.listener(name='on_message')

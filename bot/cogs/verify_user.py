@@ -1,5 +1,6 @@
 import random
 import asyncio
+import collections
 import threading
 from datetime import date, datetime
 
@@ -19,18 +20,19 @@ class VerifyUser(_Cog, name='verify'):
         def check_reaction(message):
             def check(reaction, user):
                 is_correct_reaction = lambda emoji: reaction.message.id == message.id and reaction.emoji == emoji
-                is_bot = lambda user: str(user.id) == config.bot_id
 
-                if is_correct_reaction('👍') and not is_bot(user):
-                    return True
-                if is_correct_reaction('👎') and not is_bot(user):
+                if user == context.me:
+                    return
+
+                if is_correct_reaction('👎'):
                     raise IllegalFormatError(user=user)
-                if is_correct_reaction('🥾') and not is_bot(user):
+                if is_correct_reaction('🥾'):
                     raise NotApprovedError(user=user)
-                if is_correct_reaction('🔨') and not is_bot(user):
+                if is_correct_reaction('🔨'):
                     raise ShouldBeBannedError(user=user)
-                if is_correct_reaction('🔁') and not is_bot(user):
+                if is_correct_reaction('🔁'):
                     raise DataNotFoundError(message=message, user=user)
+                return is_correct_reaction('👍')
 
             return check
 
@@ -69,7 +71,7 @@ class VerifyUser(_Cog, name='verify'):
 
             roles = { **roles, **aliases }
 
-            requested_roles = set(get_requested_roles(requested_roles, roles))
+            requested_roles = collections.OrderedDict.fromkeys(get_requested_roles(requested_roles, roles)).keys()
 
             user_embed = await get_user(context, context.message.author)
             user_embed.add_field(name='Requested roles', value=context.message.content, inline=False)
@@ -81,8 +83,7 @@ class VerifyUser(_Cog, name='verify'):
                 await user_embed.add_reaction(emoji=reaction)
 
             if len(requested_roles) == 1 or config.verified_role not in map(lambda r: str(r.id), requested_roles):
-                bot = context.message.guild.get_member(int(config.bot_id))
-                raise IllegalFormatError(bot)
+                raise IllegalFormatError(context.me)
 
             if not kwargs.get('refresh'):
                 await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
