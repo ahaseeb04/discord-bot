@@ -32,13 +32,6 @@ class CronJobs(_Cog):
     async def daily_reminder(self, channel, message):
         await self.client.get_channel(int(channel)).send(message)
 
-class Brady(_Cog):
-    @commands.has_permissions(manage_roles=True)
-    @commands.command(brief="Post as Brady.")
-    async def brady(self, context, **kwargs):
-        await context.message.delete()
-        msg = context.message.content.replace(f'{context.prefix}{context.command}', '', 1)
-        await context.channel.send(msg)
 
 class StfuuuuuAunk(_Cog):
     @_Cog.listener(name='on_message')
