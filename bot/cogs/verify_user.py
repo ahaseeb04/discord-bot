@@ -71,21 +71,21 @@ class VerifyUser(_Cog, name='verify'):
 
             requested_roles = set(get_requested_roles(requested_roles, roles))
 
-            if not kwargs.get('refresh'):
-                await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
-
             user_embed = await get_user(context, context.message.author)
             user_embed.add_field(name='Requested roles', value=context.message.content, inline=False)
             user_embed.add_field(name='Parsed roles', value=' '.join(role.mention for role in requested_roles), inline=False)
 
             user_embed = await logs.send(embed=user_embed)
 
+            for reaction in ['👍', '👎', '🥾', '🔨', '🔁']:
+                await user_embed.add_reaction(emoji=reaction)
+
             if len(requested_roles) == 1 or config.verified_role not in map(lambda r: str(r.id), requested_roles):
                 bot = context.message.guild.get_member(int(config.bot_id))
                 raise IllegalFormatError(bot)
 
-            for reaction in ['👍', '👎', '🥾', '🔨', '🔁']:
-                await user_embed.add_reaction(emoji=reaction)
+            if not kwargs.get('refresh'):
+                await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
 
             reaction, user = await self.client.wait_for('reaction_add', timeout=60*60*24, check=check_reaction(user_embed))
         except IllegalFormatError as e:
