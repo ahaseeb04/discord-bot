@@ -35,7 +35,7 @@ class CronJobs(_Cog):
 
 class Brady(_Cog):
     @commands.has_permissions(manage_roles=True)
-    @commands.command()
+    @commands.command(brief="Post as Brady.")
     async def brady(self, context, **kwargs):
         await context.message.delete()
         msg = context.message.content.replace(f'{self.client.command_prefix}{inspect.stack()[0].function}', '', 1)
