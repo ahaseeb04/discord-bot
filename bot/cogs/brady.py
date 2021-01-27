@@ -8,7 +8,6 @@ class Brady(_Cog):
     @commands.command(brief="Post as Brady.")
     async def brady(self, context, **kwargs):
         await context.message.delete()
-        print(context.message.author.name)
         msg = context.message.content.replace(f'{context.prefix}{context.command}', '', 1)
         for channel in self.client.get_guild(int(config.server_id)).channels:
             if f'{context.prefix}{channel}' in msg:
