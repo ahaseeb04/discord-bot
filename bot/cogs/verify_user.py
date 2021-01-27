@@ -63,10 +63,6 @@ class VerifyUser(_Cog, name='verify'):
             if msg is not None:
                 await msg.delete()
 
-            if len(requested_roles) == 1:
-                bot = context.message.guild.get_member(int(config.bot_id))
-                raise IllegalFormatError(bot)
-
             eng = engine(url=config.postgres_url, params=config.postgres_params)
             roles = { role.name.lower() : role.name for role in self.client.get_guild(int(config.server_id)).roles }
             aliases = df_to_dict(sql_to_df('aliases', eng, 'alias')['role'])
@@ -74,10 +70,6 @@ class VerifyUser(_Cog, name='verify'):
             roles = { **roles, **aliases }
 
             requested_roles = set(get_requested_roles(requested_roles, roles))
-
-            if config.verified_role not in map(lambda r: str(r.id), requested_roles):
-                bot = context.message.guild.get_member(int(config.bot_id))
-                raise IllegalFormatError(bot)
 
             if not kwargs.get('refresh'):
                 await context.message.channel.send(f'{context.message.author.mention} A moderator is currently reviewing your verification request and will get back to you shortly.')
@@ -87,6 +79,10 @@ class VerifyUser(_Cog, name='verify'):
             user_embed.add_field(name='Parsed roles', value=' '.join(role.mention for role in requested_roles), inline=False)
 
             user_embed = await logs.send(embed=user_embed)
+
+            if len(requested_roles) == 1 or config.verified_role not in map(lambda r: str(r.id), requested_roles):
+                bot = context.message.guild.get_member(int(config.bot_id))
+                raise IllegalFormatError(bot)
 
             for reaction in ['👍', '👎', '🥾', '🔨', '🔁']:
                 await user_embed.add_reaction(emoji=reaction)
