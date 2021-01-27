@@ -1,10 +1,12 @@
 import math
+import inspect
 from pytz import timezone
 from random import randrange, randint
 
 import aiocron
 import discord
 from discord.utils import get
+from discord.ext import commands
 
 from ._cog import _Cog
 from bot import config
@@ -31,6 +33,13 @@ class CronJobs(_Cog):
     async def daily_reminder(self, channel, message):
         await self.client.get_channel(int(channel)).send(message)
 
+class Brady(_Cog):
+    @commands.has_permissions(manage_roles=True)
+    @commands.command()
+    async def brady(self, context, **kwargs):
+        await context.message.delete()
+        msg = context.message.content.replace(f'{self.client.command_prefix}{inspect.stack()[0].function}', '', 1)
+        await context.channel.send(msg)
 
 
 class StfuuuuuAunk(_Cog):
