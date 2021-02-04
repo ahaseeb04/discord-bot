@@ -63,7 +63,7 @@ def scrape_course(course):
 
     def _scrape_section(soup):
         rows = soup.find_all('tr')[2].table
-        labels = [ r.text.lower() for r in rows.td.next_sibling.find_all('b') ]
+        labels = [ r.text.lower() for r in rows.td.next_sibling.find_all('td') ]
 
         return {
             'section_info': ' '.join(soup.tr.stripped_strings),
