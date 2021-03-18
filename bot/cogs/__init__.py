@@ -7,4 +7,4 @@ from .misc import CronJobs, StfuuuuuEmily
 from .main import Main
 from .aliases import Aliases
 from .last_message import LastMessage
-# from .brady import Brady
+from .giga import Giga
