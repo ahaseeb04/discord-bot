@@ -3,7 +3,7 @@ from discord.ext import commands
 from ._cog import _Cog
 from bot import config
 
-class Brady(_Cog):
+class Giga(_Cog):
     @commands.has_permissions(manage_roles=True)
     @commands.command(brief="Post as the bot.")
     async def giga(self, context, **kwargs):
