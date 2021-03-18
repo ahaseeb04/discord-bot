@@ -13,7 +13,7 @@ class Giga(_Cog):
             msg = context.message.content.replace(f'{context.prefix}{context.command}', '', 1)
             for word in context.message.content.split():
                 try:
-                    repl = await context.fetch_message(int(word.replace('?', '')))
+                    repl = await context.fetch_message(int(word.replace(f'{context.prefix}', '', 1)))
                     msg = msg.replace(word, '', 1)
                     await repl.reply(msg)
                     return
