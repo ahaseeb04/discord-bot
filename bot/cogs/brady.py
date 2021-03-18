@@ -5,8 +5,8 @@ from bot import config
 
 class Brady(_Cog):
     @commands.has_permissions(manage_roles=True)
-    @commands.command(brief="Post as Brady.")
-    async def brady(self, context, **kwargs):
+    @commands.command(brief="Post as the bot.")
+    async def giga(self, context, **kwargs):
         await context.message.delete()
         msg = context.message.content.replace(f'{context.prefix}{context.command}', '', 1)
         for word in context.message.content.split():
